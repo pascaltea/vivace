@@ -466,6 +466,7 @@ nav.tabs button[aria-current="page"]{color:var(--ink)}
 .rule.par{box-shadow:inset 0 0 0 2px var(--k-switch),var(--lift)}
 .rule.mag{box-shadow:inset 0 0 0 2px var(--k-ufov),var(--lift)}
 .rule.let{box-shadow:inset 0 0 0 2px var(--k-corsi),var(--lift)}
+details summary{list-style:none}details summary::-webkit-details-marker{display:none}details summary::before{content:"+ ";color:var(--muted)}details[open] summary::before{content:"− "}
 </style>
 </head>
 <body>
@@ -489,8 +490,8 @@ const $=s=>document.querySelector(s);
 const view=$("#view");
 const KEY="vivace-v1";
 
-function fresh(){return {settings:{size:"grand",pace:"calme",theme:"auto"},levels:{ufov:500,corsi:3,list:6,switch:1,swVis:1600},history:[],days:{},family:null,pending:[],bilans:[],today:null,name:"",onboarded:false}}
-function load(){try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(r&&r.levels&&r.settings){r.history=r.history.filter(h=>h.g!=="switch"||h.v===2);r.levels.switch=r.levels.switch||1;r.family=r.family||null;r.pending=r.pending||[];r.bilans=r.bilans||[];r.settings.theme=r.settings.theme||"auto";return r}}catch(e){}return fresh()}
+function fresh(){return {settings:{size:"grand",pace:"calme",theme:"auto",voice:"off"},levels:{ufov:500,corsi:3,list:6,switch:1,swVis:1600},history:[],days:{},family:null,pending:[],bilans:[],today:null,name:"",onboarded:false}}
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(r&&r.levels&&r.settings){r.history=r.history.filter(h=>h.g!=="switch"||h.v===2);r.levels.switch=r.levels.switch||1;r.family=r.family||null;r.pending=r.pending||[];r.bilans=r.bilans||[];r.settings.theme=r.settings.theme||"auto";r.settings.voice=r.settings.voice||"off";return r}}catch(e){}return fresh()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
 let D=load();
 document.documentElement.dataset.size=D.settings.size;
@@ -538,7 +539,7 @@ let runId=0, session=null;
 const alive=id=>id===runId;
 function setTab(t){document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===t?"page":"false"))}
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{({home,progress,famille,science,settings})[b.dataset.tab]()}));
-function show(html,tab){runId++;document.body.classList.remove("playing");if(tab)setTab(tab);view.innerHTML=html;window.scrollTo(0,0)}
+function show(html,tab){runId++;hush();document.body.classList.remove("playing");if(tab)setTab(tab);view.innerHTML=html;window.scrollTo(0,0)}
 
 /* ---------- week ---------- */
 function weekDays(){const n=new Date();const off=(n.getDay()+6)%7;const m=new Date(n.getFullYear(),n.getMonth(),n.getDate()-off);return Array.from({length:7},(_,i)=>new Date(m.getFullYear(),m.getMonth(),m.getDate()+i))}
@@ -596,7 +597,7 @@ function home(){
   ${due?`<section class="card stack bilan" aria-labelledby="h-bil"><p class="eyebrow">${due==="first"?"Pour bien démarrer":"Bilan du mois"}</p><h3 id="h-bil">${due==="first"?"Faites votre bilan de départ":"C'est l'heure de votre bilan mensuel"}</h3><p class="small muted">Les 4 exercices à la suite, environ 12 minutes. Il sert de repère pour mesurer vos progrès d'un mois sur l'autre.</p><button class="btn ghost" id="bil">Commencer le bilan</button></section>`:""}
   ${profileHTML()}
   <section class="card stack" aria-labelledby="h-week">
-   <div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap"><h3 id="h-week">Cette semaine</h3><span class="muted small num">${wc} jour${wc>1?"s":""} sur 5 visés</span></div>
+   ${programHead()}<div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap"><h3 id="h-week">Cette semaine</h3><span class="muted small num">${wc} jour${wc>1?"s":""} sur ${weekGoal()} visés</span></div>
    ${weekHTML()}
    <p class="small muted">Un jour manqué n'efface rien. Ce qui compte, c'est la régularité.</p>
   </section>
@@ -626,7 +627,8 @@ function onboarding(step){
    <li><span class="pi" style="background:var(--k-list)">${ICON.list}</span><span><b>Gratuit, sans publicité</b><br><span class="muted small">Pas de compte à créer. Vos données restent sur votre téléphone.</span></span></li>
   </ul>
   <button class="btn" id="obnext">Continuer</button>
- </div>`);document.body.classList.add("playing");$("#obnext").onclick=()=>onboarding(1);$("#obskip").onclick=()=>{finish();home()};return}
+  <button class="linkbtn" id="obrest" style="align-self:center">J'ai déjà un code de sauvegarde</button>
+ </div>`);document.body.classList.add("playing");$("#obnext").onclick=()=>onboarding(1);$("#obrest").onclick=()=>{D.onboarded=true;save();settings();setTimeout(()=>{const x=$("#bk-in");if(x){const dt=x.closest("details");if(dt)dt.open=true;x.scrollIntoView({block:"center"});x.focus()}},50)};$("#obskip").onclick=()=>{finish();home()};return}
  if(step===1){const S=D.settings;const seg=(k,opts)=>`<div class="seg" role="group">${opts.map(o=>`<button data-k="${k}" data-v="${o[0]}" aria-pressed="${S[k]===o[0]}">${o[1]}</button>`).join("")}</div>`;
   show(`<div class="stack-lg ob">
   <div class="gtop"><span>${dots}</span>${skip}</div>
@@ -658,9 +660,12 @@ function intro(g){
   <div class="illu" style="background:color-mix(in srgb, ${KCOL[g]} 16%, var(--surface))" aria-hidden="true">${G.illu}</div>
   <ol class="steps">${G.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
   <p class="note small muted">${G.why}</p>
-  <div class="stack" style="gap:.6rem"><button class="btn" id="start">Commencer</button>${session?'<button class="btn quiet" id="skip">Passer cet exercice</button>':""}</div>
+  <div class="stack" style="gap:.6rem"><button class="btn" id="start">${(D.practiced||{})[g]?"Commencer":"Commencer par un essai à blanc"}</button>${(D.practiced||{})[g]?'<button class="btn quiet" id="prac">Refaire un essai à blanc</button>':""}${canSpeak?'<button class="btn quiet" id="say">Écouter la consigne</button>':""}${session?'<button class="btn quiet" id="skip">Passer cet exercice</button>':""}</div>
  </div>`);
  document.body.classList.add("playing");
+ const sayIt=()=>speak(G.name+". "+G.steps.join(" "));
+ if(canSpeak){$("#say").onclick=sayIt;if(voiceOn())setTimeout(sayIt,250)}
+ if((D.practiced||{})[g])$("#prac").onclick=()=>play(g,true);
  $("#back").onclick=()=>{session=null;home()};
  $("#start").onclick=()=>play(g);
  if(session)$("#skip").onclick=()=>next();
@@ -668,7 +673,7 @@ function intro(g){
 
 /* ---------- game shell ---------- */
 function shell(g){
- runId++;document.body.classList.add("playing");
+ runId++;spoken=new Set();document.body.classList.add("playing");
  view.innerHTML=`<div class="stack">
   <div class="gtop"><button class="linkbtn" id="quit">‹ Quitter</button><span id="trial" class="num"></span></div>
   <div class="gname"><span class="pi" style="background:${KCOL[g]}">${ICON[g]}</span><h2>${GAMES[g].name}</h2></div>
@@ -681,15 +686,30 @@ function shell(g){
  window.scrollTo(0,0);
  return runId;
 }
-const msg=t=>{$("#msg").textContent=t};
-const trial=t=>{$("#trial").textContent=t};
+let PR=false,spoken=new Set();
+const canSpeak=("speechSynthesis" in window);
+function speak(t){if(!canSpeak||!t)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="fr-FR";u.rate=.95;const v=speechSynthesis.getVoices().find(x=>/^fr/i.test(x.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+function hush(){if(canSpeak)try{speechSynthesis.cancel()}catch(e){}}
+const voiceOn=()=>D.settings.voice==="on";
+const msg=t=>{$("#msg").textContent=t;if(voiceOn()&&t&&!spoken.has(t)){spoken.add(t);speak(t)}};
+const trial=t=>{$("#trial").textContent=(PR?"Essai à blanc · ":"")+t};
 function ask(opts){ // [{v,label,cls}]
  const c=$("#controls");c.innerHTML="";
  return new Promise(res=>{opts.forEach(o=>{const b=document.createElement("button");b.className="choice"+(o.cls?" "+o.cls:"");b.innerHTML=o.label;b.onclick=()=>{c.innerHTML="";res(o.v)};c.appendChild(b)})});
 }
 async function flash(ok,text){const s=$("#stage"),f=$("#fb");if(!s)return;s.classList.add(ok?"ok":"bad");f.className=ok?"ok":"bad";f.textContent=text||(ok?"Juste":"Pas tout à fait");await wait(ok?550:850);if(!$("#stage"))return;s.classList.remove("ok","bad");f.textContent="";f.className=""}
 
-async function play(g){
+async function play(g,forcePractice){
+ if(forcePractice||!(D.practiced||{})[g]){
+  const pid=shell(g);PR=true;let pr;try{pr=await RUN[g](pid)}finally{PR=false}
+  if(!pr||!alive(pid))return;
+  D.practiced=D.practiced||{};D.practiced[g]=true;save();
+  trial("");msg("Essai à blanc terminé.");
+  $("#stage").innerHTML=`<div class="bigcard"><p><b>Vous avez le principe.</b><br>La suite compte pour de vrai et s'adapte à votre niveau.</p></div>`;
+  const c=await ask([{v:"go",label:"C'est parti",cls:"one"},{v:"again",label:"Refaire l'essai",cls:"one"}]);
+  if(!alive(pid))return;
+  if(c==="again")return play(g,true);
+ }
  const id=shell(g);const before=played(g)?idx(g):null;
  const r=await RUN[g](id);
  if(!r||!alive(id))return;
@@ -699,7 +719,7 @@ async function play(g){
  D.days[today()]=true;
  if(session&&!session.bilan){const P=todayPlan();if(!P.done.includes(g))P.done.push(g)}
  save();
- queue(g,r.score,today());
+ queue(g,r.score,today());backupSoon();
  if(session)session.results.push({g,score:r.score});
  result(g,r,prev,before);
 }
@@ -716,7 +736,7 @@ function ufovHTML(inner){return `<div class="ufov">${inner}</div>`}
 const at=(p,html)=>`<div class="slot" style="left:${p.x}%;top:${p.y}%">${html}</div>`;
 const RUN={};
 RUN.ufov=async function(id){
- let dur=clamp(D.levels.ufov,40,800);const N=12;const durs=[];let streak=0,ok=0;
+ let dur=PR?750:clamp(D.levels.ufov,40,800);const N=PR?3:12;const durs=[];let streak=0,ok=0;
  msg("Fixez le centre.");
  for(let t=0;t<N;t++){
   if(!alive(id))return;trial(`Essai ${t+1} / ${N}`);
@@ -741,15 +761,16 @@ RUN.ufov=async function(id){
   const good=a1===center&&a2===pos;durs.push(dur);
   $("#stage").innerHTML=ufovHTML(at(POS[pos],SH.star));
   await flash(good,good?"Juste":(a1!==center&&a2!==pos?"La forme et la position étaient différentes":a1!==center?"La position était juste, pas la forme":"La forme était juste, l'étoile était ici"));
-  if(good){ok++;streak++;if(streak>=2){dur=Math.max(30,Math.round(dur*.85));streak=0}}else{streak=0;dur=Math.min(900,Math.round(dur*1.15))}
+  if(PR){if(good)ok++}else if(good){ok++;streak++;if(streak>=2){dur=Math.max(30,Math.round(dur*.85));streak=0}}else{streak=0;dur=Math.min(900,Math.round(dur*1.15))}
  }
+ if(PR)return {practice:true};
  const thr=Math.round(avg(durs.slice(-4)));D.levels.ufov=thr;
  return {score:thr,lines:[`${ok} essais réussis sur ${N}`,`Temps d'affichage en fin d'exercice : ${thr} ms`,thr<=300?"Des formes parasites apparaissent désormais autour de l'étoile.":"Sous 300 ms, des formes parasites viendront corser l'exercice."]};
 };
 
 /* ---------- 2. Séquence ---------- */
 RUN.corsi=async function(id){
- let L=Math.max(3,D.levels.corsi-1);let best=0,fails=0,n=0;const MAX=10;const on=calm()?850:600,off=calm()?320:220;
+ let L=PR?3:Math.max(3,D.levels.corsi-1);let best=0,fails=0,n=0;const MAX=PR?1:10;const on=calm()?850:600,off=calm()?320:220;
  const draw=()=>{$("#stage").innerHTML='<div class="grid9">'+Array.from({length:9},(_,i)=>`<button class="tile" data-i="${i}" aria-label="Case ${i+1}" disabled></button>`).join("")+"</div>"};
  while(n<MAX&&fails<2&&L<=9){
   if(!alive(id))return;n++;trial(`${L} cases`);draw();msg("Regardez bien l'ordre…");$("#controls").innerHTML="";
@@ -762,6 +783,7 @@ RUN.corsi=async function(id){
   if(!alive(id))return;
   if(good){best=Math.max(best,L);await flash(true,`Juste : ${L} cases`);L++;fails=0}else{fails++;await flash(false,fails<2?"La bonne case est en orange. On réessaie à la même longueur.":"Pas tout à fait")}
  }
+ if(PR)return {practice:true};
  D.levels.corsi=Math.max(3,best);
  return {score:best,lines:[`Plus longue séquence réussie : ${best} cases`,`${n} séquences jouées`,"Entre 5 et 7 cases, vous êtes dans la moyenne adulte."]};
 };
@@ -784,7 +806,7 @@ const SW_LV={
 const LEGEND=`<p class="legend small"><span><b class="lg par">●</b> Pair ?</span><span><b class="lg mag">▲</b> Plus que 5 ?</span><span><b class="lg let">■</b> Voyelle ?</span></p>`;
 function askT(opts,ms){return new Promise(res=>{let done=false;const tm=ms?setTimeout(()=>{if(done)return;done=true;const c=$("#controls");if(c)c.innerHTML="";res("__late")},ms):null;ask(opts).then(v=>{if(done)return;done=true;clearTimeout(tm);res(v)})})}
 RUN.switch=async function(id){
- let lv=clamp(D.levels.switch||1,1,6);const start=lv;let top=lv;const BLOCKS=4,PER=8,N=BLOCKS*PER;
+ let lv=PR?1:clamp(D.levels.switch||1,1,6);const start=lv;let top=lv;const BLOCKS=PR?1:4,PER=PR?4:8,N=BLOCKS*PER;
  const digits=[1,2,3,4,6,7,8,9],vow="AEIOU",con="BDFKMRST";
  let prev=null,pts=0,late=0,shown=0,tok=0;const R=[];
  let vis=clamp(D.levels.swVis||1600,300,2200);
@@ -830,9 +852,10 @@ RUN.switch=async function(id){
    prev=rule;
   }
   const acc=bc/PER;
-  if(acc>=.875&&lv<6)lv++;else if(acc<.625&&lv>1)lv--;
+  if(!PR){if(acc>=.875&&lv<6)lv++;else if(acc<.625&&lv>1)lv--}
   top=Math.max(top,lv);
  }
+ if(PR)return {practice:true};
  D.levels.switch=lv;if(top>=4)D.levels.swVis=vis;
  const correct=R.filter(r=>r.good).length;
  const sw=R.filter(r=>r.sw&&r.good).map(r=>r.rt),st=R.filter(r=>!r.sw&&r.good).map(r=>r.rt);
@@ -842,7 +865,7 @@ RUN.switch=async function(id){
 
 /* ---------- 4. Liste de courses ---------- */
 RUN.list=async function(id){
- const N=clamp(D.levels.list,4,16);const pool=shuffle(WORDS);const old=pool.slice(0,N),neu=pool.slice(N,2*N);
+ const N=PR?3:clamp(D.levels.list,4,16);const pool=shuffle(WORDS);const old=pool.slice(0,N),neu=pool.slice(N,2*N);
  const ms=calm()?2200:1600;
  msg("Mémorisez la liste.");$("#controls").innerHTML="";
  for(let i=0;i<N;i++){if(!alive(id))return;trial(`${i+1} / ${N}`);$("#stage").innerHTML=`<div class="bigcard"><span class="eyebrow">Article ${i+1}</span><span class="word">${old[i]}</span></div>`;await wait(ms)}
@@ -859,6 +882,7 @@ RUN.list=async function(id){
   if(a&&p.o)hits++;if(a&&!p.o)fa++;
   await flash(a===p.o,a===p.o?"Juste":(p.o?"Il était sur la liste":"Il n'y était pas"));
  }
+ if(PR)return {practice:true};
  const net=Math.max(0,hits-fa);
  if(hits/N>=.9&&fa<=1)D.levels.list=Math.min(16,N+2);else if(net/N<.6)D.levels.list=Math.max(4,N-2);
  return {score:net,lines:[`Articles reconnus : ${hits} sur ${N}`,`Fausses alertes : ${fa}`,D.levels.list>N?`Prochaine fois : liste de ${D.levels.list} articles.`:D.levels.list<N?`Prochaine fois : liste de ${D.levels.list} articles, pour consolider.`:`Prochaine fois : même longueur, ${N} articles.`]};
@@ -909,9 +933,9 @@ function done(){
  const P=todayPlan();
  show(`<div class="stack-lg">
   ${confetti()}
-  <div class="donehead"><div class="ringbig">${ring(S.bilan?res.length:P.done.length,S.bilan?4:P.order.length,200,S.bilan?"bilan":"aujourd'hui")}<span class="stamp" aria-hidden="true">済</span></div><p class="eyebrow">${S.bilan?"Bilan terminé":"Séance terminée"}</p><h1>${S.bilan?"Merci, c'est noté.":"Bien joué"+(D.name?", "+esc(D.name):"")+"."}</h1><p class="muted">${S.bilan?"Voici votre repère du jour.":wc>=5?"Objectif de la semaine atteint. Tout ce qui vient en plus est du bonus.":`Encore ${5-wc} jour${5-wc>1?"s":""} cette semaine pour atteindre l'objectif.`}</p></div>
+  <div class="donehead"><div class="ringbig">${ring(S.bilan?res.length:P.done.length,S.bilan?4:P.order.length,200,S.bilan?"bilan":"aujourd'hui")}<span class="stamp" aria-hidden="true">済</span></div><p class="eyebrow">${S.bilan?"Bilan terminé":"Séance terminée"}</p><h1>${S.bilan?"Merci, c'est noté.":"Bien joué"+(D.name?", "+esc(D.name):"")+"."}</h1><p class="muted">${S.bilan?"Voici votre repère du jour.":wc>=weekGoal()?"Objectif de la semaine atteint. Tout ce qui vient en plus est du bonus.":`Encore ${weekGoal()-wc} jour${weekGoal()-wc>1?"s":""} cette semaine pour atteindre l'objectif.`}</p></div>
   ${bil}
-  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h3>Cette semaine</h3><span class="muted small num">${wc} / 5 jours</span></div>${weekHTML()}</section>
+  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h3>Cette semaine</h3><span class="muted small num">${wc} / ${weekGoal()} jours</span></div>${weekHTML()}</section>
   ${res.length&&!S.bilan?`<section class="card rows" style="padding-block:.3rem">${res.map(x=>`<div class="row"><span class="pi" style="background:${KCOL[x.g]}">${ICON[x.g]}</span><span class="t"><b>${GAMES[x.g].name}</b><span>${GAMES[x.g].skill}</span></span><span class="num"><b>${fmt(x.score)}</b> <span class="muted small">${GAMES[x.g].unit}</span></span></div>`).join("")}</section>`:""}
   <p class="note small muted">Pour aller plus loin aujourd'hui, le plus utile n'est pas un exercice de plus : une marche rapide de 20 minutes ou un appel à quelqu'un fait autant pour le cerveau.</p>
   <button class="btn" id="h">Retour à l'accueil</button>
@@ -957,10 +981,11 @@ function progress(){
  show(`<div class="stack-lg">
   <header class="stack" style="gap:.35rem"><p class="eyebrow">Vos courbes</p><h1>Progrès</h1></header>
   ${profileHTML()}
+  ${programCard()}
   ${bh}
   <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h3>4 dernières semaines</h3><span class="muted small num">${active} jours actifs sur 28</span></div>
    <div class="cal" aria-label="Calendrier des 28 derniers jours">${days.map(d=>`<i class="${D.days[dkey(d)]?"on":""}" title="${d.toLocaleDateString("fr-FR")}"></i>`).join("")}</div>
-   <p class="small muted">Objectif raisonnable : 5 jours par semaine, pendant au moins 8 semaines.</p></section>
+   <p class="small muted">Objectif de la phase en cours : ${weekGoal()} jours par semaine.</p></section>
   <p class="small muted">Sur chaque courbe, plus haut veut dire mieux. Le dernier point est plus gros.</p>
   ${GKEYS.map(g=>{const l=lastOf(g);return `<section class="card stack" style="gap:.6rem"><div class="gname sm"><span class="pi" style="background:${KCOL[g]}">${ICON[g]}</span><div style="flex:1;min-width:0"><h3>${GAMES[g].name}</h3><span class="small muted">${GAMES[g].skill}</span></div>${l?`<span class="num"><b style="font-size:1.25rem">${fmt(l.s)}</b> <span class="small muted">${GAMES[g].unit}</span></span>`:""}</div>${chart(g)}</section>`}).join("")}
  </div>`,"progress");
@@ -1041,9 +1066,11 @@ function settings(){
   <section class="stack" style="gap:.6rem"><h3>Taille du texte</h3>${seg("size",[["normal","Normal"],["grand","Grand"],["tresgrand","Très grand"]])}</section>
   <section class="stack" style="gap:.6rem"><h3>Apparence</h3>${seg("theme",[["auto","Auto"],["light","Clair"],["dark","Sombre"],["system","Système"]])}<p class="small muted">Auto : clair en journée, sombre et chaud de 20 h à 7 h pour limiter la lumière bleue avant le coucher.</p></section>
   <section class="stack" style="gap:.6rem"><h3>Rythme</h3>${seg("pace",[["calme","Calme"],["standard","Standard"]])}<p class="small muted">Le rythme calme laisse plus de temps pour regarder les séquences et lire la liste. Le temps de Champ visuel s'adapte de toute façon à vous.</p></section>
-  <section class="card stack" style="gap:.7rem"><h3>Rappel quotidien</h3><p class="small muted">Ajoute une séance de 10 minutes à votre agenda, tous les jours à l'heure choisie, avec une alerte. Vous pourrez la déplacer ou la supprimer depuis l'agenda.</p>
+  <section class="stack" style="gap:.6rem"><h3>Voix</h3>${seg("voice",[["off","Consignes à lire"],["on","Consignes lues à voix haute"]])}<p class="small muted">${canSpeak?"La voix lit chaque consigne au début des exercices. Vous pouvez aussi toucher « Écouter la consigne » avant chaque exercice.":"Ce navigateur ne permet pas la lecture à voix haute."}</p></section>
+  ${backupSection()}
+  <section class="card stack" style="gap:.7rem"><h3>Rappels du programme</h3><p class="small muted">Ajoute votre programme à l'agenda, avec une alerte à l'heure choisie : du lundi au vendredi pendant la fondation, puis le mardi et le samedi, et une semaine de rappel aux 3ᵉ, 6ᵉ et 12ᵉ mois.</p>
    <label class="f" for="rem-time">Heure du rappel<input class="t" type="time" id="rem-time" value="${esc(D.remTime||"09:00")}"></label>
-   <a class="btn" id="rem" href="#" download="vivace-rappel.ics">Ajouter à mon agenda</a></section>
+   <a class="btn" id="rem" href="#" download="hibi-programme.ics">Ajouter mon programme à l'agenda</a></section>
   <section class="card stack" style="gap:.6rem"><h3>Bilan</h3><p class="small muted">${(D.bilans||[]).length?`Dernier bilan : ${fmtDay(D.bilans[D.bilans.length-1].d)}.`:"Pas encore de bilan."} Un bilan par mois suffit.</p><button class="btn ghost" id="sbil">Faire un bilan maintenant</button></section>
   <section class="card stack" style="gap:.6rem"><h3>Niveaux actuels</h3><ul class="plain num">${GKEYS.map(g=>`<li>${GAMES[g].name} : ${levelText(g)}</li>`).join("")}</ul></section>
   <section class="stack" style="gap:.6rem"><h3>Vos données</h3><p class="small muted">${D.family?`Vos résultats sont enregistrés sur cet appareil et partagés avec le groupe « ${esc(D.family.name)} ». Seules les personnes qui ont le code du groupe les voient.`:"Tout reste sur cet appareil. Rien n'est envoyé tant que vous ne rejoignez pas un groupe famille."}</p><div id="rz"><button class="btn ghost" id="reset">Effacer mes résultats sur cet appareil</button></div>${D.family?'<div id="lz"><button class="btn ghost" id="leave">Quitter le groupe et effacer mes résultats partagés</button></div>':""}</section>
@@ -1051,9 +1078,10 @@ function settings(){
   <p class="small muted">Hibi · version ${VERSION}</p>
  </div>`,"settings");
  $("#set-name").onchange=e=>{D.name=e.target.value.trim().slice(0,40);save()};
- const setIcs=()=>{const t=$("#rem-time").value||"09:00";D.remTime=t;save();$("#rem").href="data:text/calendar;charset=utf-8,"+encodeURIComponent(icsReminder(t))};
+ const setIcs=()=>{const t=$("#rem-time").value||"09:00";D.remTime=t;save();$("#rem").href="data:text/calendar;charset=utf-8,"+encodeURIComponent(programIcs(t))};
  setIcs();$("#rem-time").onchange=setIcs;
  $("#sbil").onclick=startBilan;
+ wireBackup();
  $("#reob").onclick=()=>onboarding(0);
  if(D.family)$("#leave").onclick=()=>{$("#lz").innerHTML=`<div class="confirm"><p>Quitter « ${esc(D.family.name)} » ? Vos résultats seront retirés du groupe. Ils restent sur cet appareil.</p><button class="btn danger" id="lyes">Oui, quitter le groupe</button><button class="btn quiet" id="lno">Annuler</button><p class="err" id="lerr" hidden></p></div>`;
   $("#lyes").onclick=async()=>{try{await rpc("vivace_leave",{p_code:D.family.code,p_member:D.family.memberId});D.family=null;D.pending=[];save();settings()}catch(e){const x=$("#lerr");x.hidden=false;x.textContent=errText(e)}};$("#lno").onclick=settings};
@@ -1063,7 +1091,7 @@ function settings(){
 }
 
 /* ---------- famille : synchronisation ---------- */
-const VERSION="4.1";
+const VERSION="5.0";
 const CFG=window.VIVACE_CONFIG||{};
 const shareOn=()=>!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1079,8 +1107,10 @@ async function rpc(fn,args){
 function errText(e){const m=e&&e.message||"";
  if(m==="offline")return "Pas de connexion internet. Réessayez quand vous êtes connecté.";
  if(m==="noconfig")return "Le partage n'est pas encore activé sur cette installation.";
+ if(/sauvegarde introuvable/i.test(m))return "Aucune sauvegarde ne correspond à ce code. Vérifiez les 12 caractères.";
  if(/introuvable/i.test(m))return "Ce code de groupe n'existe pas. Vérifiez les 8 caractères.";
  if(/prenom/i.test(m))return "Indiquez un prénom de 1 à 40 caractères.";
+ if(/could not find the function|schema cache/i.test(m))return "La sauvegarde n'est pas encore activée sur le serveur.";
  return "Le serveur n'a pas répondu correctement. Réessayez dans un instant.";
 }
 function queue(g,s,d){if(!D.family)return;D.pending.push({g,s,d});save();flush()}
@@ -1194,6 +1224,102 @@ function multiChart(g,mem){
   ${S.map(s=>`${s.pts.length>1?`<path d="${s.pts.map((v,i)=>`${i?"L":"M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`:""}<circle cx="${x(s.pts.length-1).toFixed(1)}" cy="${y(s.pts[s.pts.length-1]).toFixed(1)}" r="4" fill="${s.color}"/>`).join("")}
  </svg>`;
  return `<div class="chart">${svg}</div><div class="legend2">${S.map(s=>`<span><i style="background:${s.color}"></i>${esc(s.name)} <span class="muted num">${fmt(s.pts[s.pts.length-1])}</span></span>`).join("")}</div>`;
+}
+
+
+/* ---------- programme : fondation 8 semaines, entretien, rappels ---------- */
+const BOOST_WEEKS=[13,27,53];
+function mondayOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+function parseDay(k){const [a,b,c]=k.split("-").map(Number);return new Date(a,b-1,c)}
+function programStart(){
+ if(D.program&&D.program.start)return parseDay(D.program.start);
+ const ds=Object.keys(D.days).sort();if(!ds.length)return null;
+ D.program={start:dkey(mondayOf(parseDay(ds[0])))};save();return parseDay(D.program.start);
+}
+function programWeek(){const s=programStart();if(!s)return 0;return Math.floor((mondayOf(new Date())-s)/(7*864e5))+1}
+function phaseOf(w){if(w<=0)return "avant";if(w<=8)return "fondation";if(BOOST_WEEKS.includes(w)||(w>53&&(w-53)%26===0))return "rappel";return "entretien"}
+function weekGoal(){const ph=phaseOf(programWeek());return ph==="entretien"?2:5}
+function foundationDone(){const s=programStart();if(!s)return 0;const end=new Date(s);end.setDate(end.getDate()+56);return Object.keys(D.days).filter(k=>{const d=parseDay(k);return d>=s&&d<end}).length}
+function nextBoost(w){const all=BOOST_WEEKS.concat([79,105,131]);return all.find(x=>x>w)}
+function weekDate(w){const s=programStart();const d=new Date(s);d.setDate(d.getDate()+(w-1)*7);return d}
+const fmtShort=d=>d.toLocaleDateString("fr-FR",{day:"numeric",month:"long"});
+function programHead(){
+ const w=programWeek(),ph=phaseOf(w);
+ if(ph==="avant")return `<p class="small muted">Votre programme de 8 semaines démarre avec votre première séance.</p>`;
+ if(ph==="fondation"){const n=foundationDone();return `<div class="stack" style="gap:.4rem"><div class="bl"><span class="eyebrow">Programme · fondation, semaine ${w} sur 8</span><span class="num small muted">${n} / 40 séances</span></div><div class="bt"><span class="grow" style="width:${Math.max(2,Math.min(100,n/40*100))}%;background:var(--ink)"></span></div></div>`}
+ if(ph==="rappel")return `<div class="stack" style="gap:.2rem"><span class="eyebrow">Programme · semaine de rappel</span><p class="small">Cinq séances cette semaine pour ancrer vos acquis, comme les séances de rappel de l'étude ACTIVE.</p></div>`;
+ const nb=nextBoost(w);return `<div class="stack" style="gap:.2rem"><span class="eyebrow">Programme · entretien</span><p class="small muted">Deux séances par semaine suffisent. Prochaine semaine de rappel : semaine du ${fmtShort(weekDate(nb))}.</p></div>`;
+}
+function programCard(){
+ const s=programStart();
+ if(!s)return `<section class="card stack"><h3>Votre programme</h3><p class="small muted">Il démarre avec votre première séance : 8 semaines de fondation, puis un entretien léger et des semaines de rappel.</p></section>`;
+ const w=programWeek(),ph=phaseOf(w),n=foundationDone();
+ const end=weekDate(9);end.setDate(end.getDate()-1);
+ const rows=[
+  {t:"Fondation",d:`5 séances par semaine, du ${fmtShort(s)} au ${fmtShort(end)}`,st:w>8?"fait":ph==="fondation"?"en cours":""},
+  {t:"Entretien",d:"2 séances par semaine",st:ph==="entretien"?"en cours":w>8?"":""}]
+  .concat(BOOST_WEEKS.map((b,i)=>({t:`Rappel ${["du 3ᵉ mois","du 6ᵉ mois","du 12ᵉ mois"][i]}`,d:`5 séances la semaine du ${fmtShort(weekDate(b))}`,st:w>b?"fait":w===b?"en cours":""})));
+ return `<section class="card stack" style="gap:.6rem"><div class="profhead"><div><h3>Votre programme</h3><span class="small muted">Inspiré de l'étude ACTIVE : un entraînement régulier, puis des séances de rappel.</span></div>${ph==="fondation"?`<div class="bignum"><span class="num">${n}</span><small>sur 40</small></div>`:""}</div>
+  <div class="rows">${rows.map(r=>`<div class="row" style="min-height:3.2rem"><span class="t"><b>${r.t}</b><span>${r.d}</span></span><span class="small ${r.st==="en cours"?"":"muted"}" style="${r.st==="en cours"?"color:var(--accent2);font-weight:600":""}">${r.st}</span></div>`).join("")}</div></section>`;
+}
+function programIcs(time){
+ const [hh,mm]=time.split(":").map(Number);const z=n=>String(n).padStart(2,"0");
+ const dt=d=>`${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}T${z(hh)}${z(mm)}00`;
+ const dd=d=>`${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}T235900`;
+ const now=new Date();const stamp=`${now.getUTCFullYear()}${z(now.getUTCMonth()+1)}${z(now.getUTCDate())}T${z(now.getUTCHours())}${z(now.getUTCMinutes())}${z(now.getUTCSeconds())}Z`;
+ const url=location.origin+location.pathname;
+ let s=programStart()||mondayOf(new Date());
+ const tomorrow=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+ const fEnd=new Date(s);fEnd.setDate(fEnd.getDate()+55);
+ const ev=(uid,start,rrule,sum,desc)=>["BEGIN:VEVENT",`UID:${uid}-${Date.now()}@hibi`,`DTSTAMP:${stamp}`,`DTSTART:${dt(start)}`,"DURATION:PT10M",`RRULE:${rrule}`,`SUMMARY:${sum}`,`DESCRIPTION:${desc} ${url}`,`URL:${url}`,"BEGIN:VALARM","ACTION:DISPLAY",`DESCRIPTION:${sum}`,"TRIGGER:PT0M","END:VALARM","END:VEVENT"];
+ let L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Hibi//FR","CALSCALE:GREGORIAN"];
+ const fStart=tomorrow>s?tomorrow:s;
+ if(fStart<=fEnd)L=L.concat(ev("fondation",fStart,`FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;UNTIL=${dd(fEnd)}`,"Hibi : séance du jour","Fondation, 10 minutes."));
+ const eStart=new Date(fEnd);eStart.setDate(eStart.getDate()+2);
+ L=L.concat(ev("entretien",eStart>tomorrow?eStart:tomorrow,"FREQ=WEEKLY;BYDAY=TU,SA","Hibi : séance d'entretien","Deux séances par semaine."));
+ BOOST_WEEKS.forEach((b,i)=>{const d=new Date(s);d.setDate(d.getDate()+(b-1)*7);if(d>now)L=L.concat(ev("rappel"+b,d,"FREQ=DAILY;COUNT=5","Hibi : semaine de rappel","Cinq séances cette semaine pour ancrer vos acquis."))});
+ L.push("END:VCALENDAR");return L.join("\r\n");
+}
+
+/* ---------- sauvegarde personnelle : un code, sans compte ---------- */
+const BK_ALPHA="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+function newBackupCode(){const a=new Uint8Array(12);crypto.getRandomValues(a);return Array.from(a,x=>BK_ALPHA[x%31]).join("")}
+const fmtCode=c=>c.replace(/(.{4})(?=.)/g,"$1-");
+function backupPayload(){return {v:1,at:new Date().toISOString(),settings:D.settings,levels:D.levels,history:D.history,days:D.days,bilans:D.bilans,name:D.name,practiced:D.practiced||{},program:D.program||null,family:D.family||null,remTime:D.remTime||null}}
+let bkTimer=null;
+function backupSoon(){if(!D.backup||!shareOn())return;clearTimeout(bkTimer);bkTimer=setTimeout(backupNow,2500)}
+async function backupNow(){if(!D.backup)return false;try{await rpc("vivace_backup_save",{p_code:D.backup.code,p_data:backupPayload()});D.backup.last=new Date().toISOString();save();return true}catch(e){D.backup.error=errText(e);save();return false}}
+function backupSection(){
+ if(!shareOn())return "";
+ const B=D.backup;
+ return `<section class="card stack" style="gap:.7rem" id="bk"><h3>Sauvegarde</h3>
+  ${B?`<p class="small muted">Vos résultats sont sauvegardés automatiquement après chaque exercice. Gardez ce code : il permet de les retrouver sur un autre téléphone.</p>
+   <div class="codebox"><span><span class="small muted">Votre code de sauvegarde</span><br><b>${fmtCode(B.code)}</b></span><button class="btn quiet" id="bk-copy" style="width:auto;padding-inline:1.2rem">Copier</button></div>
+   <p class="small muted" id="bk-status">${B.last?"Dernière sauvegarde : "+new Date(B.last).toLocaleString("fr-FR",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"Pas encore de sauvegarde."}</p>
+   <button class="btn quiet" id="bk-now">Sauvegarder maintenant</button>`
+  :`<p class="small muted">Aujourd'hui, vos résultats ne vivent que dans ce téléphone. Activez la sauvegarde pour les retrouver si vous changez d'appareil. Pas de compte : un code de 12 caractères suffit.</p><button class="btn" id="bk-on">Activer la sauvegarde</button>`}
+  <details><summary class="small" style="cursor:pointer;font-weight:600">Récupérer mes résultats avec un code</summary>
+   <div class="stack" style="gap:.6rem;margin-top:.7rem"><label class="f" for="bk-in">Code de sauvegarde<input class="t code" id="bk-in" maxlength="14" autocomplete="off" autocapitalize="characters" placeholder="XXXX-XXXX-XXXX"></label>
+   <button class="btn quiet" id="bk-load">Récupérer</button><div id="bk-res"></div></div>
+  </details>
+ </section>`;
+}
+function wireBackup(){
+ if(!shareOn())return;
+ const on=$("#bk-on");if(on)on.onclick=async()=>{on.disabled=true;on.textContent="Un instant…";D.backup={code:newBackupCode(),last:null};save();const ok=await backupNow();if(!ok){const e=D.backup.error;D.backup=null;save();settings();const r=$("#bk");if(r)r.insertAdjacentHTML("beforeend",`<p class="err">${esc(e||"La sauvegarde a échoué.")}</p>`);return}settings();setTimeout(()=>{const b=$("#bk");if(b)b.scrollIntoView({block:"center"})},50)};
+ const cp=$("#bk-copy");if(cp)cp.onclick=async()=>{try{await navigator.clipboard.writeText(fmtCode(D.backup.code));cp.textContent="Copié"}catch(e){cp.textContent="Sélectionnez le code"}};
+ const now=$("#bk-now");if(now)now.onclick=async()=>{now.disabled=true;now.textContent="Sauvegarde…";const ok=await backupNow();$("#bk-status").textContent=ok?"Sauvegardé à l'instant.":D.backup.error;now.disabled=false;now.textContent="Sauvegarder maintenant"};
+ const ld=$("#bk-load");if(ld)ld.onclick=async()=>{
+  const res=$("#bk-res");const code=$("#bk-in").value.toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if(code.length!==12){res.innerHTML='<p class="err">Le code fait 12 caractères.</p>';return}
+  ld.disabled=true;ld.textContent="Recherche…";
+  try{const data=await rpc("vivace_backup_load",{p_code:code});
+   const n=(data.history||[]).length,when=data.at?new Date(data.at).toLocaleDateString("fr-FR",{day:"numeric",month:"long"}):"";
+   res.innerHTML=`<div class="confirm"><p>Sauvegarde trouvée : ${n} exercice${n>1?"s":""}${when?", du "+when:""}. Remplacer les résultats de ce téléphone ?</p><button class="btn" id="bk-yes">Oui, récupérer</button><button class="btn quiet" id="bk-no">Annuler</button></div>`;
+   $("#bk-no").onclick=settings;
+   $("#bk-yes").onclick=()=>{const keep=D.settings;Object.assign(D,{settings:Object.assign({},keep,data.settings||{}),levels:data.levels||D.levels,history:data.history||[],days:data.days||{},bilans:data.bilans||[],name:data.name||D.name,practiced:data.practiced||{},program:data.program||null,family:data.family||D.family,remTime:data.remTime||D.remTime,onboarded:true,backup:{code,last:new Date().toISOString()},today:null});save();document.documentElement.dataset.size=D.settings.size;themeNow();home()};
+  }catch(e){res.innerHTML=`<p class="err">${esc(errText(e))}</p>`;ld.disabled=false;ld.textContent="Récupérer"}
+ };
 }
 
 /* ---------- thème : clair le jour, sombre et chaud le soir ---------- */

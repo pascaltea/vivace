@@ -30,6 +30,12 @@ L'onglet Famille permet de créer un groupe, d'inviter ses proches avec un code 
 
 Sans cette étape, l'app fonctionne normalement mais les résultats restent sur chaque appareil.
 
+Pour la sauvegarde personnelle (code de 12 caractères, sans compte), exécuter aussi `supabase/schema-v2-sauvegarde.sql` si la base a été créée avant la version 5.0.
+
+## Programme
+
+Inspiré de l'étude ACTIVE : 8 semaines de fondation (5 séances par semaine), puis entretien (2 par semaine) et une semaine de rappel aux 3e, 6e et 12e mois. Les rappels peuvent être ajoutés à l'agenda depuis les Réglages.
+
 ## Mise en ligne
 
 Publié avec GitHub Pages depuis la branche `main`, dossier racine (Settings → Pages). Après chaque modification de l'app, incrémenter `VERSION` dans `sw.js` pour que les téléphones récupèrent la nouvelle version.
