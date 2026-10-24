@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vivace</title>
+<meta name="description" content="Dix minutes par jour pour garder l'esprit rapide. Entraînement cognitif gratuit pour les 40 ans et plus.">
+<meta name="theme-color" content="#1C6E5A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Vivace">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script src="config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600..800&display=swap">
+<style>
+/* Layout: one calm column (max 34rem), fixed bottom tab bar, large tap targets; games take the full column with nav hidden */
+:root{
+  --bg:#EEF2EF; --surface:#FFFFFF; --tint:#E1EBE6; --line:#CFDAD4;
+  --ink:#142824; --muted:#53645D;
+  --accent:#1C6E5A; --accent-ink:#FFFFFF; --warm:#B26C17;
+  --good:#2E7D4F; --bad:#B3412E;
+  --display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1715; --surface:#17221F; --tint:#1C2B27; --line:#2B3B35;
+  --ink:#E5EEEA; --muted:#9DADA6;
+  --accent:#62C4A4; --accent-ink:#0B1915; --warm:#E3A75C;
+  --good:#71CF98; --bad:#EF8C78; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1715; --surface:#17221F; --tint:#1C2B27; --line:#2B3B35;
+  --ink:#E5EEEA; --muted:#9DADA6;
+  --accent:#62C4A4; --accent-ink:#0B1915; --warm:#E3A75C;
+  --good:#71CF98; --bad:#EF8C78; color-scheme:dark }
+
+html{font-size:18px}
+html[data-size="normal"]{font-size:16px}
+html[data-size="grand"]{font-size:18px}
+html[data-size="tresgrand"]{font-size:21px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1rem;line-height:1.55;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+img{max-width:100%}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+.wrap{max-width:34rem;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:calc(1.25rem + env(safe-area-inset-top,0px)) calc(7rem + env(safe-area-inset-bottom,0px))}
+body.playing .wrap{padding-bottom:calc(2rem + env(safe-area-inset-bottom,0px))}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:2.1rem;font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.55rem;font-weight:700}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:1rem}
+.stack-lg{display:flex;flex-direction:column;gap:1.75rem}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+.num{font-variant-numeric:tabular-nums}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.25rem}
+.hero{background:var(--accent);color:var(--accent-ink);border-radius:22px;padding:1.4rem 1.3rem;display:flex;flex-direction:column;gap:1rem}
+.hero .eyebrow{color:inherit;opacity:.8}
+.hero ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.55rem}
+.hero li{display:flex;align-items:baseline;gap:.75rem}
+.hero li b{font-family:var(--display);font-size:.95rem;min-width:1.3rem;opacity:.75}
+.hero li span.sk{opacity:.78;font-size:.88rem}
+.core{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1px solid currentColor;border-radius:99px;padding:.05rem .45rem;margin-left:.35rem;opacity:.9}
+
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;min-height:3.4rem;border-radius:14px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:1.05rem;padding:.6rem 1rem}
+.hero .btn{background:var(--accent-ink);color:var(--accent)}
+.btn.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.btn.quiet{background:var(--tint);color:var(--ink)}
+.btn.danger{background:var(--bad);color:var(--surface)}
+button:focus-visible{outline:3px solid var(--warm);outline-offset:3px}
+.linkbtn{background:none;border:0;color:var(--accent);font-weight:700;padding:.5rem 0;min-height:2.75rem}
+
+.week{display:flex;justify-content:space-between;gap:.4rem}
+.day{display:flex;flex-direction:column;align-items:center;gap:.3rem;flex:1}
+.day i{width:2.1rem;height:2.1rem;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-style:normal}
+.day.on i{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.day.today i{border-color:var(--accent)}
+.day small{font-size:.75rem;color:var(--muted);font-weight:700}
+
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:1rem;padding:.9rem 0;border:0;border-top:1px solid var(--line);background:none;text-align:left;width:100%;min-height:4rem}
+.row:first-child{border-top:0}
+.row .ic{width:2.75rem;height:2.75rem;border-radius:12px;background:var(--tint);display:grid;place-items:center;flex:none}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block}
+.row .t span{color:var(--muted);font-size:.88rem}
+.row .chev{color:var(--muted)}
+
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px));z-index:5}
+nav.tabs .in{max-width:34rem;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.tabs button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:.15rem;padding:.55rem 0 .6rem;min-height:3.6rem;color:var(--muted);font-size:.72rem;font-weight:700;min-width:0}
+nav.tabs button[aria-current="page"]{color:var(--accent)}
+nav.tabs svg{width:1.45rem;height:1.45rem}
+body.playing nav.tabs{display:none}
+
+/* game */
+.gtop{display:flex;justify-content:space-between;align-items:center;min-height:2.75rem}
+.gtop span{color:var(--muted);font-weight:700;font-size:.9rem}
+#msg{font-size:1.1rem;min-height:3.3rem}
+#stage{transition:box-shadow .2s}
+#stage.ok{box-shadow:0 0 0 4px var(--good);border-radius:22px}
+#stage.bad{box-shadow:0 0 0 4px var(--bad);border-radius:22px}
+#controls{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;min-height:4.2rem}
+#controls .one{grid-column:1/-1}
+.choice{min-height:4.2rem;border-radius:16px;border:2px solid var(--line);background:var(--surface);font-weight:700;font-size:1.1rem;display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.5rem}
+.choice:active{background:var(--tint)}
+#fb{min-height:1.6rem;text-align:center;font-weight:700}
+#fb.ok{color:var(--good)} #fb.bad{color:var(--bad)}
+
+.ufov{position:relative;width:100%;max-width:22rem;aspect-ratio:1;margin:0 auto;border-radius:50%;background:var(--tint);border:1px solid var(--line);overflow:hidden}
+.slot{position:absolute;transform:translate(-50%,-50%);width:15%;aspect-ratio:1;display:grid;place-items:center}
+.slot svg{width:100%;height:100%}
+.slot button{width:100%;height:100%;border-radius:50%;border:2.5px dashed var(--accent);background:var(--surface)}
+.cross{font-family:var(--display);font-size:2rem;color:var(--muted)}
+.maskch{position:absolute;transform:translate(-50%,-50%);color:var(--muted);font-size:1.4rem;line-height:1}
+
+.grid9{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;max-width:21rem;margin:0 auto;padding:.7rem;background:var(--tint);border-radius:22px}
+.tile{aspect-ratio:1;border-radius:14px;border:2px solid var(--line);background:var(--surface);transition:background .12s}
+.tile.lit{background:var(--warm);border-color:var(--warm)}
+.tile.tap{background:var(--accent);border-color:var(--accent)}
+.tile.wrong{background:var(--bad);border-color:var(--bad)}
+.tile:disabled{cursor:default}
+
+.rule{border-radius:14px;padding:.7rem 1rem;text-align:center;font-weight:700;font-size:1.05rem;letter-spacing:.03em}
+.rule.par{background:var(--accent);color:var(--accent-ink)}
+.rule.mag{background:var(--warm);color:var(--surface)}
+.bigcard{background:var(--surface);border:1px solid var(--line);border-radius:22px;display:grid;place-items:center;min-height:12rem;gap:.5rem;padding:1rem;text-align:center}
+.rc{position:relative;transition:background .15s}
+.rc.par,.lg.par{background:var(--accent);color:var(--accent-ink)}
+.rc.mag,.lg.mag{background:var(--warm);color:var(--surface)}
+.rc.let,.lg.let{background:var(--ink);color:var(--bg)}
+.rc.par,.rc.mag,.rc.let{border-color:transparent}
+.rsym{position:absolute;top:.7rem;left:.9rem;font-size:1.2rem}
+.rule.let{background:var(--ink);color:var(--bg)}
+.timebar{height:6px;background:var(--tint);border-radius:3px;overflow:hidden}
+.timebar.off{visibility:hidden}
+.timebar i{display:block;height:100%;width:100%;background:var(--warm);animation:drain linear forwards}
+@keyframes drain{from{width:100%}to{width:0}}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:.4rem 1rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:.35rem}
+.lg{display:inline-grid;place-items:center;width:1.5rem;height:1.5rem;border-radius:6px;font-size:.8rem}
+.digit{font-family:var(--display);font-size:5.5rem;font-weight:800;line-height:1}
+.word{font-family:var(--display);font-size:2.2rem;font-weight:700;line-height:1.15}
+
+.big{font-family:var(--display);font-size:3.4rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.unit{font-size:1.1rem;color:var(--muted);font-weight:700;margin-left:.35rem;font-family:var(--body)}
+.delta{border-radius:12px;padding:.7rem .9rem;background:var(--tint)}
+ul.plain{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:.35rem}
+
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:.4rem;background:var(--tint);padding:.3rem;border-radius:14px}
+.seg button{border:0;background:none;border-radius:10px;min-height:2.9rem;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+
+.chart svg{width:100%;height:auto;display:block}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:.35rem}
+.cal i{aspect-ratio:1;border-radius:6px;background:var(--tint)}
+.cal i.on{background:var(--accent)}
+.cal i.fut{background:transparent;border:1px dashed var(--line)}
+
+.pairs{display:flex;flex-direction:column}
+.pair{padding:.85rem 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:.25rem}
+.pair:first-child{border-top:0;padding-top:0}
+.pair .q{color:var(--muted);font-size:.92rem}
+.pair .a{font-weight:700}
+.note{border-left:3px solid var(--warm);padding-left:.85rem}
+a{color:var(--accent)}
+.steps{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:.5rem}
+.illu{display:grid;place-items:center;background:var(--tint);border-radius:16px;padding:1rem}
+.illu svg{width:100%;max-width:15rem;height:auto}
+.confirm{display:flex;flex-direction:column;gap:.6rem}
+/* famille */
+:root{--s1:var(--accent);--s2:var(--warm);--s3:#3E6CB0;--s4:#8A57B0;--s5:#B0436A;--s6:#5E7A2E}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--s3:#8DB2EC;--s4:#C9A2E8;--s5:#EE94B3;--s6:#B5D17A}}
+:root[data-theme="dark"]{--s3:#8DB2EC;--s4:#C9A2E8;--s5:#EE94B3;--s6:#B5D17A}
+label.f{display:flex;flex-direction:column;gap:.35rem;font-weight:700}
+input.t{font:inherit;font-weight:400;min-height:3.2rem;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:.5rem .85rem;width:100%}
+input.t:focus{outline:3px solid var(--warm);outline-offset:2px}
+input.code{text-transform:uppercase;letter-spacing:.18em;font-variant-numeric:tabular-nums;font-weight:700}
+.err{color:var(--bad);font-weight:700}
+.codebox{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:var(--tint);border-radius:14px;padding:.8rem 1rem}
+.codebox b{font-size:1.35rem;letter-spacing:.16em;font-variant-numeric:tabular-nums;user-select:all}
+.mem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.45rem 1rem;align-items:center;padding:.8rem 0;border-top:1px solid var(--line)}
+.mem:first-child{border-top:0;padding-top:0}
+.mem .nm{display:flex;align-items:center;gap:.5rem;font-weight:700;min-width:0}
+.mem .nm i{width:.8rem;height:.8rem;border-radius:50%;flex:none}
+.mem .wk{grid-column:1/-1;display:flex;gap:.3rem}
+.mem .wk span{flex:1;height:.55rem;border-radius:4px;background:var(--tint)}
+.mem .wk span.on{background:var(--accent)}
+.you{font-size:.72rem;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:0 .4rem}
+.legend2{display:flex;flex-wrap:wrap;gap:.3rem 1rem;font-size:.85rem}
+.legend2 span{display:inline-flex;align-items:center;gap:.35rem}
+.legend2 i{width:.75rem;height:.75rem;border-radius:50%}
+.tabs2{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;background:var(--tint);padding:.3rem;border-radius:14px}
+.tabs2 button{border:0;background:none;border-radius:10px;min-height:2.9rem;font-weight:700;color:var(--muted)}
+.tabs2 button[aria-pressed="true"]{background:var(--surface);color:var(--ink)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap"><main id="view" aria-live="polite"></main></div>
+
+<nav class="tabs" aria-label="Navigation">
+  <div class="in">
+    <button data-tab="home" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>Aujourd'hui</button>
+    <button data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l6-6 4 4 8-9"/><path d="M15 7h6v6"/></svg>Progrès</button>
+    <button data-tab="famille"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9.5" r="2.4"/><path d="M3 19c.6-3.3 3-5 6-5s5.4 1.7 6 5M15.5 14.2c2.6-.4 4.8 1 5.5 4.3"/></svg>Famille</button>
+    <button data-tab="science"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h11a5 5 0 0 1 5 5v9H9a5 5 0 0 1-5-5z"/><path d="M8 10h8M8 14h5"/></svg>Science</button>
+    <button data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Réglages</button>
+  </div>
+</nav>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const view=$("#view");
+const KEY="vivace-v1";
+
+function fresh(){return {settings:{size:"grand",pace:"calme"},levels:{ufov:500,corsi:3,list:6,switch:1,swVis:1600},history:[],days:{},family:null,pending:[]}}
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(r&&r.levels&&r.settings){r.history=r.history.filter(h=>h.g!=="switch"||h.v===2);r.levels.switch=r.levels.switch||1;r.family=r.family||null;r.pending=r.pending||[];return r}}catch(e){}return fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
+let D=load();
+document.documentElement.dataset.size=D.settings.size;
+
+const dkey=d=>{const z=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())};
+const today=()=>dkey(new Date());
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const avg=a=>a.reduce((s,x)=>s+x,0)/(a.length||1);
+const fmt=n=>new Intl.NumberFormat("fr-FR").format(n);
+const calm=()=>D.settings.pace==="calme";
+
+const ICON={
+ ufov:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 3v3M21 12h-3"/></svg>',
+ corsi:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+ switch:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h12l-3-3M20 17H8l3 3"/></svg>',
+ list:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2" /><circle cx="5" cy="18" r="1"/></svg>'
+};
+
+const GAMES={
+ ufov:{name:"Champ visuel",skill:"Vitesse de traitement",better:"lower",unit:"ms",
+   steps:["Fixez la croix au centre.","Une forme apparaît au centre, et une étoile sur le pourtour, très brièvement.","Dites quelle forme était au centre, puis touchez l'endroit où était l'étoile."],
+   why:"C'est le type d'exercice le mieux étudié chez les plus de 60 ans. Le temps d'affichage raccourcit quand vous réussissez, et s'allonge quand vous ratez.",
+   illu:'<svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="92" fill="var(--surface)" stroke="var(--line)"/><circle cx="100" cy="100" r="16" fill="var(--ink)"/><polygon points="170,62 175,74 188,75 178,83 181,96 170,89 159,96 162,83 152,75 165,74" fill="var(--warm)"/></svg>'},
+ corsi:{name:"Séquence",skill:"Mémoire de travail",better:"higher",unit:"cases",
+   steps:["Des cases s'allument l'une après l'autre.","Quand c'est à vous, touchez-les dans le même ordre.","Chaque réussite ajoute une case. Deux erreurs de suite terminent l'exercice."],
+   why:"Retenir et manipuler quelques éléments à la fois sert tous les jours : un code, un itinéraire, une liste d'étapes.",
+   illu:'<svg viewBox="0 0 200 200"><g fill="var(--surface)" stroke="var(--line)" stroke-width="2"><rect x="20" y="20" width="48" height="48" rx="10"/><rect x="76" y="20" width="48" height="48" rx="10"/><rect x="132" y="20" width="48" height="48" rx="10" fill="var(--warm)" stroke="var(--warm)"/><rect x="20" y="76" width="48" height="48" rx="10"/><rect x="76" y="76" width="48" height="48" rx="10"/><rect x="132" y="76" width="48" height="48" rx="10"/><rect x="20" y="132" width="48" height="48" rx="10" fill="var(--warm)" stroke="var(--warm)"/><rect x="76" y="132" width="48" height="48" rx="10"/><rect x="132" y="132" width="48" height="48" rx="10"/></g><text x="156" y="51" text-anchor="middle" font-size="20" font-weight="700" fill="var(--surface)">1</text><text x="44" y="163" text-anchor="middle" font-size="20" font-weight="700" fill="var(--surface)">2</text></svg>'},
+ switch:{name:"Aiguillage",skill:"Flexibilité mentale",better:"higher",unit:"points",
+   steps:["Un chiffre s'affiche avec une règle : « pair ou impair ? » ou « plus ou moins que 5 ? ». La règle change sans prévenir.","Six niveaux : une lettre et une troisième règle s'ajoutent, puis la règle n'est plus donnée que par la couleur de la carte, et la carte s'efface de plus en plus vite.","Tous les 8 essais, vous montez si vous êtes presque sans faute, et redescendez en cas de difficulté."],
+   why:"Passer d'une règle à l'autre est une des capacités qui ralentit le plus avec l'âge. Garder en tête la règle et l'information après qu'elles ont disparu fait travailler la mémoire de travail en même temps.",
+   illu:'<svg viewBox="0 0 200 200"><rect x="20" y="20" width="160" height="34" rx="9" fill="var(--warm)"/><text x="100" y="42" text-anchor="middle" font-size="13" font-weight="700" fill="var(--surface)" textLength="140" lengthAdjust="spacingAndGlyphs" font-family="Atkinson Hyperlegible, system-ui, sans-serif">PLUS OU MOINS QUE 5 ?</text><rect x="20" y="64" width="160" height="116" rx="16" fill="var(--surface)" stroke="var(--line)"/><text x="100" y="150" text-anchor="middle" font-size="76" font-weight="800" fill="var(--ink)" font-family="Bricolage Grotesque, system-ui, sans-serif">7</text></svg>'},
+ list:{name:"Liste de courses",skill:"Mémoire des événements",better:"higher",unit:"mots",
+   steps:["Une liste de courses défile, un article à la fois.","Ensuite, des articles s'affichent : étaient-ils sur la liste ?","La liste s'allonge quand vous réussissez bien."],
+   why:"Des mots du quotidien, pas de vocabulaire rare. Le score compte les bonnes reconnaissances moins les fausses alertes.",
+   illu:'<svg viewBox="0 0 200 200"><rect x="40" y="16" width="120" height="168" rx="12" fill="var(--surface)" stroke="var(--line)" stroke-width="2"/><g font-size="16" fill="var(--ink)"><text x="58" y="56">Poireaux</text><text x="58" y="88">Beurre</text><text x="58" y="120">Citron</text><text x="58" y="152" fill="var(--muted)">…</text></g><path d="M58 64h70M58 96h52M58 128h56" stroke="var(--line)"/></svg>'}
+};
+
+const WORDS=["Pommes","Poireaux","Beurre","Farine","Yaourts","Café","Thé","Riz","Lentilles","Carottes","Oignons","Ail","Citron","Oranges","Bananes","Fromage","Jambon","Poulet","Saumon","Œufs","Lait","Pain","Confiture","Miel","Chocolat","Biscuits","Pâtes","Tomates","Courgettes","Salade","Persil","Basilic","Moutarde","Vinaigre","Huile d'olive","Sel","Poivre","Sucre","Crème","Épinards","Champignons","Poivrons","Avocat","Kiwis","Fraises","Raisin","Noix","Amandes","Olives","Thon","Sardines","Cornichons","Petits pois","Haricots verts","Pommes de terre","Concombre","Radis","Lessive","Éponges","Savon","Dentifrice","Bougies","Ampoules","Piles","Papier toilette","Clémentines","Poires","Cacao","Semoule","Brioche"];
+
+/* ---------- navigation ---------- */
+let runId=0, session=null;
+const alive=id=>id===runId;
+function setTab(t){document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===t?"page":"false"))}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{({home,progress,famille,science,settings})[b.dataset.tab]()}));
+function show(html,tab){runId++;document.body.classList.remove("playing");if(tab)setTab(tab);view.innerHTML=html;window.scrollTo(0,0)}
+
+/* ---------- week ---------- */
+function weekDays(){const n=new Date();const off=(n.getDay()+6)%7;const m=new Date(n.getFullYear(),n.getMonth(),n.getDate()-off);return Array.from({length:7},(_,i)=>new Date(m.getFullYear(),m.getMonth(),m.getDate()+i))}
+function weekHTML(){const L=["L","M","M","J","V","S","D"];const t=today();
+ return '<div class="week" role="list">'+weekDays().map((d,i)=>{const k=dkey(d);const on=!!D.days[k];return `<div class="day${on?" on":""}${k===t?" today":""}" role="listitem" aria-label="${d.toLocaleDateString("fr-FR",{weekday:"long"})}${on?", séance faite":""}"><i>${on?"✓":""}</i><small>${L[i]}</small></div>`}).join("")+"</div>"}
+function weekCount(){return weekDays().filter(d=>D.days[dkey(d)]).length}
+
+function sessionOrder(){const rest=["corsi","switch","list"];const n=Math.floor(Date.now()/864e5)%3;return ["ufov"].concat(rest.slice(n),rest.slice(0,n))}
+
+/* ---------- home ---------- */
+function home(){
+ const order=sessionOrder();const dateStr=new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+ const done=D.days[today()];const wc=weekCount();
+ show(`<div class="stack-lg">
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">${dateStr}</p><h1>Vivace</h1><p class="muted">Dix minutes par jour pour garder l'esprit rapide. Gratuit, sans compte, sans publicité.</p></header>
+  <section class="hero" aria-labelledby="h-sess">
+   <div class="stack" style="gap:.25rem"><p class="eyebrow">${done?"Séance faite aujourd'hui":"Séance du jour · environ 10 min"}</p><h2 id="h-sess">${done?"Une de plus pour la route ?":"Quatre exercices, dans cet ordre"}</h2></div>
+   <ol>${order.map((g,i)=>`<li><b>${i+1}</b><span><strong>${GAMES[g].name}</strong>${g==="ufov"?'<span class="core">cœur</span>':""}<br><span class="sk">${GAMES[g].skill}</span></span></li>`).join("")}</ol>
+   <button class="btn" id="go">${done?"Refaire une séance":"Commencer la séance"}</button>
+  </section>
+  <section class="card stack" aria-labelledby="h-week">
+   <div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap"><h3 id="h-week">Cette semaine</h3><span class="muted small num">${wc} jour${wc>1?"s":""} sur 5 visés</span></div>
+   ${weekHTML()}
+   <p class="small muted">Un jour manqué n'efface rien. Ce qui compte, c'est la régularité sur plusieurs semaines.</p>
+  </section>
+  <section class="stack" aria-labelledby="h-free"><h3 id="h-free">Exercices à la carte</h3>
+   <div class="card rows" style="padding-block:.3rem">${Object.keys(GAMES).map(g=>`<button class="row" data-g="${g}"><span class="ic">${ICON[g]}</span><span class="t"><b>${GAMES[g].name}</b><span>${GAMES[g].skill} · niveau ${levelText(g)}</span></span><span class="chev" aria-hidden="true">›</span></button>`).join("")}</div>
+  </section>
+ </div>`,"home");
+ $("#go").onclick=()=>{session={order,i:0,results:[]};intro(order[0])};
+ view.querySelectorAll(".row[data-g]").forEach(b=>b.onclick=()=>{session=null;intro(b.dataset.g)});
+}
+function levelText(g){const L=D.levels;if(g==="ufov")return L.ufov+" ms";if(g==="corsi")return L.corsi+" cases";if(g==="list")return L.list+" articles";return "niveau "+(L.switch||1)+" / 6"}
+function lastOf(g){for(let i=D.history.length-1;i>=0;i--)if(D.history[i].g===g)return D.history[i];return null}
+
+/* ---------- intro ---------- */
+function intro(g){
+ const G=GAMES[g];const pos=session?`Exercice ${session.i+1} sur ${session.order.length}`:"Exercice libre";
+ show(`<div class="stack-lg">
+  <div class="gtop"><button class="linkbtn" id="back">‹ Retour</button><span>${pos}</span></div>
+  <div class="stack" style="gap:.3rem"><p class="eyebrow">${G.skill}</p><h2>${G.name}</h2></div>
+  <div class="illu" aria-hidden="true">${G.illu}</div>
+  <ol class="steps">${G.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+  <p class="note small muted">${G.why}</p>
+  <div class="stack" style="gap:.6rem"><button class="btn" id="start">Commencer</button>${session?'<button class="btn quiet" id="skip">Passer cet exercice</button>':""}</div>
+ </div>`);
+ $("#back").onclick=()=>{session=null;home()};
+ $("#start").onclick=()=>play(g);
+ if(session)$("#skip").onclick=()=>next();
+}
+
+/* ---------- game shell ---------- */
+function shell(g){
+ runId++;document.body.classList.add("playing");
+ view.innerHTML=`<div class="stack">
+  <div class="gtop"><button class="linkbtn" id="quit">‹ Quitter</button><span id="trial" class="num"></span></div>
+  <h2>${GAMES[g].name}</h2>
+  <p id="msg"></p>
+  <div id="stage"></div>
+  <div id="fb" aria-live="polite"></div>
+  <div id="controls"></div>
+ </div>`;
+ $("#quit").onclick=()=>{session=null;home()};
+ window.scrollTo(0,0);
+ return runId;
+}
+const msg=t=>{$("#msg").textContent=t};
+const trial=t=>{$("#trial").textContent=t};
+function ask(opts){ // [{v,label,cls}]
+ const c=$("#controls");c.innerHTML="";
+ return new Promise(res=>{opts.forEach(o=>{const b=document.createElement("button");b.className="choice"+(o.cls?" "+o.cls:"");b.innerHTML=o.label;b.onclick=()=>{c.innerHTML="";res(o.v)};c.appendChild(b)})});
+}
+async function flash(ok,text){const s=$("#stage"),f=$("#fb");if(!s)return;s.classList.add(ok?"ok":"bad");f.className=ok?"ok":"bad";f.textContent=text||(ok?"Juste":"Pas tout à fait");await wait(ok?550:850);if(!$("#stage"))return;s.classList.remove("ok","bad");f.textContent="";f.className=""}
+
+async function play(g){
+ const id=shell(g);
+ const r=await RUN[g](id);
+ if(!r||!alive(id))return;
+ const prev=lastOf(g);
+ D.history.push({d:today(),g,s:r.score,v:2});
+ if(D.history.length>600)D.history=D.history.slice(-600);
+ D.days[today()]=true;save();
+ queue(g,r.score,today());
+ if(session)session.results.push({g,score:r.score});
+ result(g,r,prev);
+}
+
+/* ---------- 1. Champ visuel ---------- */
+const POS=Array.from({length:8},(_,i)=>{const a=(i*45-90)*Math.PI/180;return {x:50+38*Math.cos(a),y:50+38*Math.sin(a)}});
+const SH={
+ rond:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="var(--ink)"/></svg>',
+ carre:'<svg viewBox="0 0 40 40"><rect x="6" y="6" width="28" height="28" rx="3" fill="var(--ink)"/></svg>',
+ star:'<svg viewBox="0 0 40 40"><polygon points="20,3 25,15 38,15 28,23 32,36 20,28 8,36 12,23 2,15 15,15" fill="var(--warm)"/></svg>',
+ tri:'<svg viewBox="0 0 40 40"><polygon points="20,5 36,34 4,34" fill="var(--muted)"/></svg>'
+};
+function ufovHTML(inner){return `<div class="ufov">${inner}</div>`}
+const at=(p,html)=>`<div class="slot" style="left:${p.x}%;top:${p.y}%">${html}</div>`;
+const RUN={};
+RUN.ufov=async function(id){
+ let dur=clamp(D.levels.ufov,40,800);const N=12;const durs=[];let streak=0,ok=0;
+ msg("Fixez le centre.");
+ for(let t=0;t<N;t++){
+  if(!alive(id))return;trial(`Essai ${t+1} / ${N}`);
+  const center=Math.random()<.5?"rond":"carre";const pos=Math.floor(Math.random()*8);const distract=dur<=300;
+  msg("Fixez le centre.");
+  $("#stage").innerHTML=ufovHTML(`<div class="slot" style="left:50%;top:50%"><span class="cross">+</span></div>`);
+  await wait(calm()?900:650);if(!alive(id))return;
+  let inner=at({x:50,y:50},SH[center])+at(POS[pos],SH.star);
+  if(distract)POS.forEach((p,i)=>{if(i!==pos)inner+=at(p,SH.tri)});
+  $("#stage").innerHTML=ufovHTML(inner);
+  await wait(dur);if(!alive(id))return;
+  let m="";const ch=["▲","■","●","✦","◆"];for(let k=0;k<46;k++)m+=`<span class="maskch" style="left:${8+Math.random()*84}%;top:${8+Math.random()*84}%">${ch[k%5]}</span>`;
+  $("#stage").innerHTML=ufovHTML(m);
+  await wait(400);if(!alive(id))return;
+  $("#stage").innerHTML=ufovHTML("");
+  msg("Au centre, c'était :");
+  const a1=await ask([{v:"rond",label:'<svg width="28" height="28" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="currentColor"/></svg> Un rond'},{v:"carre",label:'<svg width="28" height="28" viewBox="0 0 40 40"><rect x="6" y="6" width="28" height="28" rx="3" fill="currentColor"/></svg> Un carré'}]);
+  if(!alive(id))return;
+  msg("Touchez l'endroit où était l'étoile.");
+  const a2=await new Promise(res=>{$("#stage").innerHTML=ufovHTML(POS.map((p,i)=>at(p,`<button aria-label="Position ${i+1}" data-i="${i}"></button>`)).join(""));$("#stage").querySelectorAll("button").forEach(b=>b.onclick=()=>res(+b.dataset.i))});
+  if(!alive(id))return;
+  const good=a1===center&&a2===pos;durs.push(dur);
+  $("#stage").innerHTML=ufovHTML(at(POS[pos],SH.star));
+  await flash(good,good?"Juste":(a1!==center&&a2!==pos?"La forme et la position étaient différentes":a1!==center?"La position était juste, pas la forme":"La forme était juste, l'étoile était ici"));
+  if(good){ok++;streak++;if(streak>=2){dur=Math.max(30,Math.round(dur*.85));streak=0}}else{streak=0;dur=Math.min(900,Math.round(dur*1.15))}
+ }
+ const thr=Math.round(avg(durs.slice(-4)));D.levels.ufov=thr;
+ return {score:thr,lines:[`${ok} essais réussis sur ${N}`,`Temps d'affichage en fin d'exercice : ${thr} ms`,thr<=300?"Des formes parasites apparaissent désormais autour de l'étoile.":"Sous 300 ms, des formes parasites viendront corser l'exercice."]};
+};
+
+/* ---------- 2. Séquence ---------- */
+RUN.corsi=async function(id){
+ let L=Math.max(3,D.levels.corsi-1);let best=0,fails=0,n=0;const MAX=10;const on=calm()?850:600,off=calm()?320:220;
+ const draw=()=>{$("#stage").innerHTML='<div class="grid9">'+Array.from({length:9},(_,i)=>`<button class="tile" data-i="${i}" aria-label="Case ${i+1}" disabled></button>`).join("")+"</div>"};
+ while(n<MAX&&fails<2&&L<=9){
+  if(!alive(id))return;n++;trial(`${L} cases`);draw();msg("Regardez bien l'ordre…");$("#controls").innerHTML="";
+  const seq=shuffle([0,1,2,3,4,5,6,7,8]).slice(0,L);
+  await wait(700);
+  for(const i of seq){if(!alive(id))return;const t=$(`.tile[data-i="${i}"]`);t.classList.add("lit");await wait(on);if(!alive(id))return;t.classList.remove("lit");await wait(off)}
+  if(!alive(id))return;
+  msg("À vous : touchez les cases dans le même ordre.");
+  const good=await new Promise(res=>{let k=0;const tiles=view.querySelectorAll(".tile");tiles.forEach(t=>{t.disabled=false;t.onclick=()=>{const i=+t.dataset.i;if(i===seq[k]){k++;t.classList.add("tap");setTimeout(()=>t.classList.remove("tap"),220);if(k===seq.length){tiles.forEach(x=>x.disabled=true);res(true)}}else{t.classList.add("wrong");tiles.forEach(x=>x.disabled=true);const r=$(`.tile[data-i="${seq[k]}"]`);if(r)r.classList.add("lit");res(false)}}})});
+  if(!alive(id))return;
+  if(good){best=Math.max(best,L);await flash(true,`Juste : ${L} cases`);L++;fails=0}else{fails++;await flash(false,fails<2?"La bonne case est en orange. On réessaie à la même longueur.":"Pas tout à fait")}
+ }
+ D.levels.corsi=Math.max(3,best);
+ return {score:best,lines:[`Plus longue séquence réussie : ${best} cases`,`${n} séquences jouées`,"Entre 5 et 7 cases, vous êtes dans la moyenne adulte."]};
+};
+
+/* ---------- 3. Aiguillage ---------- */
+const RULES={
+ par:{long:"PAIR OU IMPAIR ?",q:"PAIR ?",sym:"●",ok:(d,l)=>d%2===0,labels:["Pair","Impair"]},
+ mag:{long:"PLUS OU MOINS QUE 5 ?",q:"PLUS QUE 5 ?",sym:"▲",ok:(d,l)=>d>5,labels:["Plus de 5","Moins de 5"]},
+ let:{long:"VOYELLE OU CONSONNE ?",q:"VOYELLE ?",sym:"■",ok:(d,l)=>"AEIOU".includes(l),labels:["Voyelle","Consonne"]}
+};
+const R3=["par","mag","let"];
+const SW_LV={
+ 1:{rules:["par","mag"],p:.45,dl:0,cue:"text",pair:false,desc:"Deux règles, consigne écrite, sans limite de temps."},
+ 2:{rules:["par","mag"],p:.65,dl:4000,cue:"text",pair:false,desc:"La règle change plus souvent. 4 secondes par réponse."},
+ 3:{rules:R3,p:.65,dl:4000,cue:"q",pair:true,desc:"Une lettre et un chiffre, trois règles. On répond par Oui ou Non."},
+ 4:{rules:R3,p:.7,dl:3500,cue:"color",pair:true,desc:"Plus de consigne écrite : la couleur de la carte donne la règle. La paire s'efface après un instant, et cet instant raccourcit à chaque bonne réponse."},
+ 5:{rules:R3,p:.7,dl:3000,cue:"flash",pair:true,desc:"La couleur et la paire s'effacent ensemble. Retenez les deux pour répondre. 3 secondes."},
+ 6:{rules:R3,p:.75,dl:2200,cue:"flash",pair:true,desc:"Comme le niveau 5, avec 2,2 secondes pour répondre."}
+};
+const LEGEND=`<p class="legend small"><span><b class="lg par">●</b> Pair ?</span><span><b class="lg mag">▲</b> Plus que 5 ?</span><span><b class="lg let">■</b> Voyelle ?</span></p>`;
+function askT(opts,ms){return new Promise(res=>{let done=false;const tm=ms?setTimeout(()=>{if(done)return;done=true;const c=$("#controls");if(c)c.innerHTML="";res("__late")},ms):null;ask(opts).then(v=>{if(done)return;done=true;clearTimeout(tm);res(v)})})}
+RUN.switch=async function(id){
+ let lv=clamp(D.levels.switch||1,1,6);const start=lv;let top=lv;const BLOCKS=4,PER=8,N=BLOCKS*PER;
+ const digits=[1,2,3,4,6,7,8,9],vow="AEIOU",con="BDFKMRST";
+ let prev=null,pts=0,late=0,shown=0,tok=0;const R=[];
+ let vis=clamp(D.levels.swVis||1600,300,2200);
+ for(let b=0;b<BLOCKS;b++){
+  const cfg=SW_LV[lv];
+  if(shown!==lv){
+   shown=lv;trial(`Niveau ${lv} / 6`);msg(b===0?"Voici votre niveau de départ.":(lv>R[R.length-1].lv?"Bravo, on monte d'un cran.":"On redescend d'un cran pour consolider."));
+   $("#stage").innerHTML=`<div class="bigcard"><span class="eyebrow">Niveau ${lv} sur 6</span><p>${cfg.desc}</p>${cfg.cue==="color"||cfg.cue==="flash"?LEGEND:""}</div>`;
+   await ask([{v:1,label:"C'est parti",cls:"one"}]);if(!alive(id))return;
+  }
+  let bc=0;
+  for(let t=0;t<PER;t++){
+   if(!alive(id))return;const n=b*PER+t+1;trial(`Niveau ${lv} · ${n} / ${N}`);msg("");
+   const keep=prev&&cfg.rules.includes(prev)&&Math.random()>cfg.p;
+   const pool=prev?cfg.rules.filter(r=>r!==prev):cfg.rules;
+   const rule=keep?prev:pool[Math.floor(Math.random()*pool.length)];
+   const d=digits[Math.floor(Math.random()*8)];
+   const l=Math.random()<.5?vow[Math.floor(Math.random()*5)]:con[Math.floor(Math.random()*8)];
+   const Rl=RULES[rule];
+   const cueTxt=cfg.cue==="text"?Rl.long:cfg.cue==="q"?Rl.q:Rl.sym;
+   const stim=cfg.pair?`${l}${d}`:`${d}`;
+   const leg=cfg.cue==="color"||cfg.cue==="flash"?LEGEND:"";
+   const bar=cfg.dl?`<div class="timebar"><i style="animation-duration:${cfg.dl}ms"></i></div>`:`<div class="timebar off"></div>`;
+   const colored=cfg.cue==="color"||cfg.cue==="flash";
+   if(colored){
+    trial(`Niveau ${lv} · ${n} / ${N} · affichage ${(vis/1000).toLocaleString("fr-FR",{maximumFractionDigits:1})} s`);
+    $("#stage").innerHTML=`<div class="stack" style="gap:.6rem"><div class="bigcard rc ${rule}"><span class="rsym">${Rl.sym}</span><span class="digit num">${stim}</span></div>${bar}${leg}</div>`;
+   }else{
+    $("#stage").innerHTML=`<div class="stack" style="gap:.6rem"><div class="rule ${rule}">${cueTxt}</div><div class="bigcard"><span class="digit num">${stim}</span></div>${bar}${leg}</div>`;
+   }
+   const tk=++tok;
+   if(colored)setTimeout(()=>{if(tk!==tok||!alive(id))return;const c=$(".rc");if(!c)return;c.querySelector(".digit").textContent="?";if(cfg.cue==="flash"){c.className="bigcard rc";c.querySelector(".rsym").textContent=""}},vis);
+   const opts=cfg.cue==="text"?[{v:"oui",label:Rl.labels[0]},{v:"non",label:Rl.labels[1]}]:[{v:"oui",label:"Oui"},{v:"non",label:"Non"}];
+   const t0=performance.now();
+   const a=await askT(opts,cfg.dl);tok++;if(!alive(id))return;
+   const rt=performance.now()-t0;
+   const good=a!=="__late"&&((a==="oui")===Rl.ok(d,l));
+   if(a==="__late")late++;
+   if(good){bc++;pts+=lv}
+   if(colored)vis=good?Math.max(300,Math.round(vis*.88)):Math.min(2200,Math.round(vis*1.15));
+   R.push({rt,good,lv,sw:prev!==null&&rule!==prev,late:a==="__late"});
+   await flash(good,a==="__late"?"Trop tard":good?"Juste":`Non : la règle était « ${Rl.long.toLowerCase()} »`);
+   prev=rule;
+  }
+  const acc=bc/PER;
+  if(acc>=.875&&lv<6)lv++;else if(acc<.625&&lv>1)lv--;
+  top=Math.max(top,lv);
+ }
+ D.levels.switch=lv;if(top>=4)D.levels.swVis=vis;
+ const correct=R.filter(r=>r.good).length;
+ const sw=R.filter(r=>r.sw&&r.good).map(r=>r.rt),st=R.filter(r=>!r.sw&&r.good).map(r=>r.rt);
+ const cost=sw.length&&st.length?Math.round(avg(sw)-avg(st)):null;
+ return {score:pts,lines:[`Niveau : départ ${start}, plus haut atteint ${top}, prochaine fois ${lv} (sur 6)`,`${correct} bonnes réponses sur ${N}${late?`, dont ${late} réponse${late>1?"s":""} trop tardive${late>1?"s":""}`:""}`,"Chaque bonne réponse rapporte autant de points que le niveau où vous êtes.",...(top>=4?[`Temps d'affichage de la paire en fin d'exercice : ${(vis/1000).toLocaleString("fr-FR",{maximumFractionDigits:2})} s`]:[]),cost!==null?`Quand la règle change, vous mettez ${fmt(Math.max(0,cost))} ms de plus. Ce délai baisse avec l'entraînement.`:"Pas assez de changements de règle pour mesurer le temps de bascule."]};
+};
+
+/* ---------- 4. Liste de courses ---------- */
+RUN.list=async function(id){
+ const N=clamp(D.levels.list,4,16);const pool=shuffle(WORDS);const old=pool.slice(0,N),neu=pool.slice(N,2*N);
+ const ms=calm()?2200:1600;
+ msg("Mémorisez la liste.");$("#controls").innerHTML="";
+ for(let i=0;i<N;i++){if(!alive(id))return;trial(`${i+1} / ${N}`);$("#stage").innerHTML=`<div class="bigcard"><span class="eyebrow">Article ${i+1}</span><span class="word">${old[i]}</span></div>`;await wait(ms)}
+ if(!alive(id))return;
+ trial("");msg("La liste est finie. Prenez une respiration.");
+ $("#stage").innerHTML=`<div class="bigcard"><p class="muted">Des articles vont s'afficher.<br>Pour chacun : était-il sur la liste ?</p></div>`;
+ await ask([{v:1,label:"Je suis prêt",cls:"one"}]);if(!alive(id))return;
+ const probes=shuffle(old.map(w=>({w,o:true})).concat(neu.map(w=>({w,o:false}))));
+ let hits=0,fa=0;msg("Était-il sur la liste ?");
+ for(let i=0;i<probes.length;i++){
+  if(!alive(id))return;trial(`${i+1} / ${probes.length}`);const p=probes[i];
+  $("#stage").innerHTML=`<div class="bigcard"><span class="word">${p.w}</span></div>`;
+  const a=await ask([{v:true,label:"Oui, sur la liste"},{v:false,label:"Non"}]);if(!alive(id))return;
+  if(a&&p.o)hits++;if(a&&!p.o)fa++;
+  await flash(a===p.o,a===p.o?"Juste":(p.o?"Il était sur la liste":"Il n'y était pas"));
+ }
+ const net=Math.max(0,hits-fa);
+ if(hits/N>=.9&&fa<=1)D.levels.list=Math.min(16,N+2);else if(net/N<.6)D.levels.list=Math.max(4,N-2);
+ return {score:net,lines:[`Articles reconnus : ${hits} sur ${N}`,`Fausses alertes : ${fa}`,D.levels.list>N?`Prochaine fois : liste de ${D.levels.list} articles.`:D.levels.list<N?`Prochaine fois : liste de ${D.levels.list} articles, pour consolider.`:`Prochaine fois : même longueur, ${N} articles.`]};
+};
+
+/* ---------- résultat ---------- */
+function deltaText(g,s,prev){
+ if(!prev)return "Premier score enregistré. C'est votre point de départ.";
+ const G=GAMES[g];const d=G.better==="lower"?prev.s-s:s-prev.s;
+ if(d>0)return G.better==="lower"?`${fmt(d)} ms plus rapide que la dernière fois.`:`${fmt(d)} de plus que la dernière fois.`;
+ if(d===0)return "Comme la dernière fois. Le niveau tient.";
+ return "Un peu en dessous de la dernière fois. Les scores varient d'un jour à l'autre, regardez plutôt la courbe sur plusieurs semaines.";
+}
+function result(g,r,prev){
+ const G=GAMES[g];const more=session&&session.i<session.order.length-1;
+ show(`<div class="stack-lg">
+  <div class="gtop"><span></span><span>${session?`Exercice ${session.i+1} sur ${session.order.length}`:"Exercice libre"}</span></div>
+  <div class="stack" style="gap:.4rem"><p class="eyebrow">${G.name} · ${G.skill}</p><p><span class="big">${fmt(r.score)}</span><span class="unit">${G.unit}</span></p><p class="small muted">${G.better==="lower"?"Plus bas, c'est mieux.":"Plus haut, c'est mieux."}</p></div>
+  <p class="delta">${deltaText(g,r.score,prev)}</p>
+  <ul class="plain">${r.lines.map(l=>`<li>${l}</li>`).join("")}</ul>
+  <div class="stack" style="gap:.6rem"><button class="btn" id="nx">${more?"Exercice suivant : "+GAMES[session.order[session.i+1]].name:session?"Voir le bilan de la séance":"Terminer"}</button>${session?"":'<button class="btn quiet" id="again">Rejouer</button>'}</div>
+ </div>`);
+ document.body.classList.add("playing");
+ $("#nx").onclick=()=>session?next():home();
+ if(!session)$("#again").onclick=()=>play(g);
+}
+function next(){if(!session)return home();session.i++;if(session.i<session.order.length)intro(session.order[session.i]);else done()}
+function done(){
+ const res=session.results;session=null;const wc=weekCount();
+ show(`<div class="stack-lg">
+  <div class="stack" style="gap:.35rem"><p class="eyebrow">Séance terminée</p><h2>Bien joué. À demain.</h2></div>
+  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h3>Cette semaine</h3><span class="muted small num">${wc} / 5 jours</span></div>${weekHTML()}</section>
+  ${res.length?`<section class="card rows" style="padding-block:.3rem">${res.map(x=>`<div class="row"><span class="ic">${ICON[x.g]}</span><span class="t"><b>${GAMES[x.g].name}</b><span>${GAMES[x.g].skill}</span></span><span class="num"><b>${fmt(x.score)}</b> <span class="muted small">${GAMES[x.g].unit}</span></span></div>`).join("")}</section>`:""}
+  <p class="note small muted">Pour aller plus loin aujourd'hui, le plus utile n'est pas un exercice de plus : une marche rapide de 20 minutes ou un appel à quelqu'un fait autant pour le cerveau.</p>
+  <button class="btn" id="h">Retour à l'accueil</button>
+ </div>`,"home");
+ $("#h").onclick=home;
+}
+
+/* ---------- progrès ---------- */
+function chart(g){
+ const pts=D.history.filter(h=>h.g===g).slice(-12);const G=GAMES[g];
+ if(pts.length<2)return `<p class="small muted">${pts.length?"Encore une partie et la courbe apparaît.":"Pas encore de partie. La courbe apparaîtra après deux exercices."}</p>`;
+ const W=320,H=120,pl=40,pr=12,pt=12,pb=22;const vals=pts.map(p=>p.s);
+ let mn=Math.min(...vals),mx=Math.max(...vals);if(mn===mx){mn-=1;mx+=1}
+ const inv=G.better==="lower";
+ const y=v=>{const f=(v-mn)/(mx-mn);return pt+(inv?f:1-f)*(H-pt-pb)};
+ const x=i=>pl+i*(W-pl-pr)/(pts.length-1);
+ const line=pts.map((p,i)=>`${i?"L":"M"}${x(i).toFixed(1)} ${y(p.s).toFixed(1)}`).join(" ");
+ const area=line+` L${x(pts.length-1).toFixed(1)} ${H-pb} L${pl} ${H-pb} Z`;
+ const best=inv?mn:mx,worst=inv?mx:mn;
+ return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Évolution ${G.name}, ${pts.length} dernières parties">
+  <line x1="${pl}" x2="${W-pr}" y1="${pt}" y2="${pt}" stroke="var(--line)" stroke-dasharray="3 4"/>
+  <line x1="${pl}" x2="${W-pr}" y1="${H-pb}" y2="${H-pb}" stroke="var(--line)"/>
+  <text x="${pl-6}" y="${pt+4}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(Math.round(best))}</text>
+  <text x="${pl-6}" y="${H-pb+4}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(Math.round(worst))}</text>
+  <text x="${pl}" y="${H-5}" font-size="11" fill="var(--muted)">${pts.length} dernières parties</text>
+  <path d="${area}" fill="var(--accent)" fill-opacity=".12"/>
+  <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  ${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.s).toFixed(1)}" r="${i===pts.length-1?4.5:2.5}" fill="${i===pts.length-1?"var(--warm)":"var(--accent)"}"/>`).join("")}
+ </svg></div>`;
+}
+function progress(){
+ const n=new Date();const days=[];for(let i=27;i>=0;i--)days.push(new Date(n.getFullYear(),n.getMonth(),n.getDate()-i));
+ const active=days.filter(d=>D.days[dkey(d)]).length;
+ show(`<div class="stack-lg">
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Vos courbes</p><h1>Progrès</h1><p class="muted">Sur chaque courbe, plus haut veut dire mieux. Le dernier point est en orange.</p></header>
+  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h3>4 dernières semaines</h3><span class="muted small num">${active} jours actifs sur 28</span></div>
+   <div class="cal" aria-label="Calendrier des 28 derniers jours">${days.map(d=>`<i class="${D.days[dkey(d)]?"on":""}" title="${d.toLocaleDateString("fr-FR")}"></i>`).join("")}</div>
+   <p class="small muted">Objectif raisonnable : 5 jours par semaine, pendant au moins 8 semaines.</p></section>
+  ${Object.keys(GAMES).map(g=>{const l=lastOf(g);return `<section class="card stack" style="gap:.6rem"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap"><div><h3>${GAMES[g].name}</h3><span class="small muted">${GAMES[g].skill}</span></div>${l?`<span class="num"><b style="font-size:1.25rem">${fmt(l.s)}</b> <span class="small muted">${GAMES[g].unit}</span></span>`:""}</div>${chart(g)}</section>`}).join("")}
+ </div>`,"progress");
+}
+
+/* ---------- science ---------- */
+function science(){
+ const P=[
+  ["« Seulement 3 jeux gratuits par jour »","Tout est gratuit et illimité. Pas de compte, pas d'e-mail demandé."],
+  ["« Impossible de résilier l'abonnement depuis l'app »","Il n'y a pas d'abonnement."],
+  ["« Les mêmes jeux reviennent, on plafonne après quelques semaines »","Chaque exercice ajuste sa difficulté à chaque essai, et l'ordre de la séance change chaque jour."],
+  ["« Trop rapide quand on débute après 60 ans, consignes floues »","Rythme calme par défaut, consigne illustrée avant chaque exercice, pas de compte à rebours sauf quand la vitesse est justement ce qu'on travaille."],
+  ["« Vocabulaire obscur, sans rapport avec le raisonnement »","Des mots du quotidien, comme une vraie liste de courses."],
+  ["« Des scores sans signification »","Des unités concrètes : des millisecondes, des cases, des mots."],
+  ["« Texte trop petit »","Police conçue pour la lisibilité et taille réglable en trois niveaux."],
+  ["« Des promesses scientifiques exagérées »","Cette page, qui dit ce qu'on sait et ce qu'on ne sait pas."]
+ ];
+ show(`<div class="stack-lg">
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Ce que dit la recherche</p><h1>Science</h1></header>
+  <section class="stack">
+   <h3>Ce qui a le plus de preuves</h3>
+   <p>L'étude ACTIVE a suivi près de 2 800 personnes âgées pendant 20 ans. Seul l'entraînement à la vitesse de traitement visuel, complété par des séances de rappel, a été associé à un risque de démence plus faible, d'environ 25 %. Les groupes entraînés à la mémoire ou au raisonnement n'ont pas montré cet effet.</p>
+   <p>C'est pour ça que <strong>Champ visuel</strong> ouvre chaque séance et ajuste sa difficulté en continu.</p>
+  </section>
+  <section class="stack">
+   <h3>Ce qu'il faut savoir</h3>
+   <ul class="plain">
+    <li>On progresse d'abord sur les exercices entraînés. Le bénéfice dans la vie quotidienne est plus limité et varie selon les personnes.</li>
+    <li>Ces résultats concernent des personnes en bonne santé. Il s'agit de retarder un déclin, pas de traiter une maladie.</li>
+    <li>La régularité compte plus que la durée : de courtes séances sur plusieurs semaines, avec des reprises.</li>
+   </ul>
+  </section>
+  <section class="card stack">
+   <h3>Les autres leviers, souvent plus puissants</h3>
+   <ul class="plain">
+    <li><strong>Bouger</strong> : marche rapide, vélo, natation, plusieurs fois par semaine.</li>
+    <li><strong>Dormir</strong> : un sommeil régulier aide la mémoire à se consolider.</li>
+    <li><strong>Voir du monde</strong> : conversations, activités en groupe, bénévolat.</li>
+    <li><strong>Entendre</strong> : une perte auditive non corrigée fatigue le cerveau.</li>
+    <li><strong>Surveiller tension et glycémie</strong> avec votre médecin.</li>
+   </ul>
+  </section>
+  <section class="stack">
+   <h3>Ce que les avis des utilisateurs ont changé</h3>
+   <p class="small muted">Plaintes qui reviennent dans les avis des grandes applis d'entraînement cérébral, et la réponse de Vivace.</p>
+   <div class="card pairs">${P.map(p=>`<div class="pair"><span class="q">${p[0]}</span><span class="a">${p[1]}</span></div>`).join("")}</div>
+  </section>
+  <p class="note small">Vivace n'est pas un dispositif médical. Si des changements de mémoire vous inquiètent, vous ou un proche, parlez-en à votre médecin.</p>
+  <p class="small muted">Sources : <a href="https://ufhealth.org/news/2026/decades-later-brain-training-lowers-dementia-risk" target="_blank" rel="noopener">UF Health, suivi à 20 ans de l'étude ACTIVE</a> · <a href="https://www.psychiatrist.com/news/brain-training-could-delay-dementia-for-years/" target="_blank" rel="noopener">Psychiatrist.com</a></p>
+ </div>`,"science");
+}
+
+/* ---------- réglages ---------- */
+function settings(){
+ const S=D.settings;
+ const seg=(k,opts)=>`<div class="seg" role="group">${opts.map(o=>`<button data-k="${k}" data-v="${o[0]}" aria-pressed="${S[k]===o[0]}">${o[1]}</button>`).join("")}</div>`;
+ show(`<div class="stack-lg">
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Confort</p><h1>Réglages</h1></header>
+  <section class="stack" style="gap:.6rem"><h3>Taille du texte</h3>${seg("size",[["normal","Normal"],["grand","Grand"],["tresgrand","Très grand"]])}</section>
+  <section class="stack" style="gap:.6rem"><h3>Rythme</h3>${seg("pace",[["calme","Calme"],["standard","Standard"]])}<p class="small muted">Le rythme calme laisse plus de temps pour regarder les séquences et lire la liste. Le temps de Champ visuel s'adapte de toute façon à vous.</p></section>
+  <section class="card stack" style="gap:.6rem"><h3>Niveaux actuels</h3><ul class="plain num">${Object.keys(GAMES).map(g=>`<li>${GAMES[g].name} : ${levelText(g)}</li>`).join("")}</ul></section>
+  <section class="stack" style="gap:.6rem"><h3>Vos données</h3><p class="small muted">${D.family?`Vos résultats sont enregistrés sur cet appareil et partagés avec le groupe « ${esc(D.family.name)} ». Seules les personnes qui ont le code du groupe les voient.`:"Tout reste sur cet appareil. Rien n'est envoyé tant que vous ne rejoignez pas un groupe famille."}</p><div id="rz"><button class="btn ghost" id="reset">Effacer mes résultats sur cet appareil</button></div>${D.family?'<div id="lz"><button class="btn ghost" id="leave">Quitter le groupe et effacer mes résultats partagés</button></div>':""}</section>
+  <p class="small muted">Vivace · version ${VERSION}</p>
+ </div>`,"settings");
+ if(D.family)$("#leave").onclick=()=>{$("#lz").innerHTML=`<div class="confirm"><p>Quitter « ${esc(D.family.name)} » ? Vos résultats seront retirés du groupe. Ils restent sur cet appareil.</p><button class="btn danger" id="lyes">Oui, quitter le groupe</button><button class="btn quiet" id="lno">Annuler</button><p class="err" id="lerr" hidden></p></div>`;
+  $("#lyes").onclick=async()=>{try{await rpc("vivace_leave",{p_code:D.family.code,p_member:D.family.memberId});D.family=null;D.pending=[];save();settings()}catch(e){const x=$("#lerr");x.hidden=false;x.textContent=errText(e)}};$("#lno").onclick=settings};
+ view.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{D.settings[b.dataset.k]=b.dataset.v;if(b.dataset.k==="size")document.documentElement.dataset.size=b.dataset.v;save();settings()});
+ $("#reset").onclick=()=>{$("#rz").innerHTML=`<div class="confirm"><p>Effacer tout l'historique et revenir aux niveaux de départ ?</p><button class="btn danger" id="yes">Oui, tout effacer</button><button class="btn quiet" id="no">Annuler</button></div>`;
+  $("#yes").onclick=()=>{const s=D.settings,f=D.family;D=fresh();D.settings=s;D.family=f;save();settings()};$("#no").onclick=settings};
+}
+
+/* ---------- famille : synchronisation ---------- */
+const VERSION="1.1";
+const CFG=window.VIVACE_CONFIG||{};
+const shareOn=()=>!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>(crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==="x"?r:(r&3|8)).toString(16)}));
+async function rpc(fn,args){
+ if(!shareOn())throw new Error("noconfig");
+ let r;
+ try{r=await fetch(CFG.supabaseUrl.replace(/\/$/,"")+"/rest/v1/rpc/"+fn,{method:"POST",headers:{"Content-Type":"application/json",apikey:CFG.supabaseAnonKey,Authorization:"Bearer "+CFG.supabaseAnonKey},body:JSON.stringify(args)})}catch(e){throw new Error("offline")}
+ const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(e){}
+ if(!r.ok)throw new Error((j&&j.message)||"server");
+ return j;
+}
+function errText(e){const m=e&&e.message||"";
+ if(m==="offline")return "Pas de connexion internet. Réessayez quand vous êtes connecté.";
+ if(m==="noconfig")return "Le partage n'est pas encore activé sur cette installation.";
+ if(/introuvable/i.test(m))return "Ce code de groupe n'existe pas. Vérifiez les 8 caractères.";
+ if(/prenom/i.test(m))return "Indiquez un prénom de 1 à 40 caractères.";
+ return "Le serveur n'a pas répondu correctement. Réessayez dans un instant.";
+}
+function queue(g,s,d){if(!D.family)return;D.pending.push({g,s,d});save();flush()}
+let flushing=false;
+async function flush(){
+ if(flushing||!D.family||!shareOn()||!D.pending.length)return;flushing=true;
+ try{while(D.pending.length&&D.family){const p=D.pending[0];await rpc("vivace_add",{p_code:D.family.code,p_member:D.family.memberId,p_game:p.g,p_score:p.s,p_day:p.d});D.pending.shift();save()}}catch(e){}
+ flushing=false;
+}
+window.addEventListener("online",flush);
+
+/* ---------- famille : écrans ---------- */
+let famTab=null;
+function famille(){
+ if(!shareOn())return show(`<div class="stack-lg">
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Entre proches</p><h1>Famille</h1></header>
+  <div class="card stack"><h3>Le partage n'est pas encore activé</h3><p>Cette installation de Vivace n'est reliée à aucune base de données. Les exercices fonctionnent normalement, mais les résultats restent sur cet appareil.</p><p class="small muted">Pour l'activer, renseignez l'adresse et la clé Supabase dans le fichier config.js du dépôt (voir le README).</p></div>
+ </div>`,"famille");
+ if(!D.family)return joinView();
+ return familyView();
+}
+function joinView(){
+ const inv=(new URLSearchParams(location.search).get("famille")||"").toUpperCase();
+ if(famTab===null)famTab=inv?"join":"create";
+ const j=famTab==="join";
+ show(`<div class="stack-lg">
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Entre proches</p><h1>Famille</h1><p class="muted">Créez un groupe, invitez vos proches avec un code, et suivez ensemble la régularité et les progrès de chacun.</p></header>
+  <div class="tabs2" role="group"><button id="t-create" aria-pressed="${!j}">Créer un groupe</button><button id="t-join" aria-pressed="${j}">J'ai un code</button></div>
+  <form class="card stack" id="ff" novalidate>
+   <label class="f" for="f-name">Votre prénom<input class="t" id="f-name" autocomplete="given-name" maxlength="40" placeholder="Ex. Pascal" value="${esc(D.lastName||"")}"></label>
+   ${j?`<label class="f" for="f-code">Code du groupe<input class="t code" id="f-code" maxlength="8" autocomplete="off" autocapitalize="characters" placeholder="8 caractères" value="${esc(inv)}"></label>`
+      :`<label class="f" for="f-group">Nom du groupe<input class="t" id="f-group" maxlength="40" placeholder="Ex. Famille Tea"></label>`}
+   <p class="err" id="ferr" hidden></p>
+   <button class="btn" type="submit" id="fgo">${j?"Rejoindre le groupe":"Créer le groupe"}</button>
+   <p class="small muted">Vos résultats passés seront ajoutés au groupe. Pas d'e-mail ni de mot de passe : le code du groupe sert de clé, partagez-le seulement avec vos proches.</p>
+  </form>
+ </div>`,"famille");
+ $("#t-create").onclick=()=>{famTab="create";joinView()};
+ $("#t-join").onclick=()=>{famTab="join";joinView()};
+ $("#ff").onsubmit=async ev=>{ev.preventDefault();
+  const name=$("#f-name").value.trim();const err=$("#ferr");err.hidden=true;
+  if(!name){err.hidden=false;err.textContent="Indiquez votre prénom.";return}
+  const btn=$("#fgo");btn.disabled=true;btn.textContent="Un instant…";
+  try{
+   const memberId=uid();let code,gname;
+   if(j){code=$("#f-code").value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"");if(code.length!==8)throw new Error("introuvable");gname=await rpc("vivace_join",{p_code:code,p_member:memberId,p_name:name})}
+   else{gname=$("#f-group").value.trim()||("Famille de "+name);code=await rpc("vivace_create_family",{p_name:gname});await rpc("vivace_join",{p_code:code,p_member:memberId,p_name:name})}
+   D.family={code,name:gname,memberId,memberName:name};D.lastName=name;
+   D.pending=D.history.map(h=>({g:h.g,s:h.s,d:h.d})).concat(D.pending);save();
+   if(inv)history.replaceState(null,"",location.pathname);
+   await flush();familyView(true);
+  }catch(e){err.hidden=false;err.textContent=errText(e);btn.disabled=false;btn.textContent=j?"Rejoindre le groupe":"Créer le groupe"}
+ };
+}
+function inviteLink(){return location.origin+location.pathname+"?famille="+D.family.code}
+async function invite(){
+ const url=inviteLink(),text=`Rejoins notre groupe « ${D.family.name} » sur Vivace, 10 minutes par jour pour garder l'esprit vif. Code du groupe : ${D.family.code}`;
+ const out=$("#invout");
+ if(navigator.share){try{await navigator.share({title:"Vivace",text,url});return}catch(e){if(e&&e.name==="AbortError")return}}
+ try{await navigator.clipboard.writeText(text+"\n"+url);out.hidden=false;out.textContent="Invitation copiée. Collez-la dans un message à vos proches."}catch(e){out.hidden=false;out.textContent="Envoyez ce lien à vos proches : "+url}
+}
+const SERIES=["var(--s1)","var(--s2)","var(--s3)","var(--s4)","var(--s5)","var(--s6)"];
+async function familyView(fresh){
+ const F=D.family;
+ show(`<div class="stack-lg">
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Groupe famille</p><h1>${esc(F.name)}</h1></header>
+  <section class="stack" style="gap:.6rem">
+   <div class="codebox"><span><span class="small muted">Code du groupe</span><br><b>${F.code}</b></span><button class="btn" id="inv" style="width:auto;padding-inline:1.2rem">Inviter mes proches</button></div>
+   <p class="small muted" id="invout" hidden></p>
+  </section>
+  <div id="famdata" class="stack-lg"><div class="card"><p class="muted">Chargement des résultats du groupe…</p></div></div>
+ </div>`,"famille");
+ $("#inv").onclick=invite;
+ await flush();
+ let rows;
+ try{rows=await rpc("vivace_family",{p_code:F.code,p_member:F.memberId})}
+ catch(e){const box=$("#famdata");if(!box)return;box.innerHTML=`<div class="card stack"><p class="err">${errText(e)}</p><button class="btn quiet" id="retry">Réessayer</button></div>`;$("#retry").onclick=()=>familyView();return}
+ const box=$("#famdata");if(!box)return;
+ const by={};(rows||[]).forEach(r=>{if(!by[r.mkey])by[r.mkey]={key:r.mkey,name:r.name,me:r.is_me,res:[]};if(r.game)by[r.mkey].res.push({g:r.game,s:r.score,d:r.day})});
+ const mem=Object.values(by).sort((a,b)=>(b.me-a.me)||a.name.localeCompare(b.name,"fr"));
+ mem.forEach((m,i)=>m.color=SERIES[i%SERIES.length]);
+ const wk=weekDays().map(dkey);
+ const memRows=mem.map(m=>{const days=new Set(m.res.map(r=>r.d));const n=wk.filter(k=>days.has(k)).length;const last=m.res.length?m.res.map(r=>r.d).sort().pop():null;
+  return `<div class="mem"><span class="nm"><i style="background:${m.color}"></i><span style="min-width:0;overflow-wrap:anywhere">${esc(m.name)}</span>${m.me?'<span class="you">vous</span>':""}</span><span class="num small"><b>${n}</b> / 5 jours</span><div class="wk" aria-label="${n} jours actifs cette semaine">${wk.map(k=>`<span class="${days.has(k)?"on":""}"></span>`).join("")}</div><span class="small muted" style="grid-column:1/-1">${last?"Dernière séance : "+fmtDay(last):"Pas encore de séance"}</span></div>`}).join("");
+ const total=mem.reduce((s,m)=>s+wk.filter(k=>m.res.some(r=>r.d===k)).length,0),goal=mem.length*5;
+ box.innerHTML=`
+  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;flex-wrap:wrap"><h3>Cette semaine</h3><span class="small muted num">${total} jours actifs sur ${goal} visés à ${mem.length}</span></div>
+   <div>${memRows||'<p class="muted">Personne pour l\'instant.</p>'}</div>
+   ${mem.length<2?'<p class="small muted">Invitez un proche pour commencer à vous suivre mutuellement.</p>':""}</section>
+  ${Object.keys(GAMES).map(g=>`<section class="card stack" style="gap:.6rem"><div><h3>${GAMES[g].name}</h3><span class="small muted">${GAMES[g].skill} · ${GAMES[g].better==="lower"?"en "+GAMES[g].unit+", plus haut sur la courbe = plus rapide":GAMES[g].unit+", plus haut = mieux"}</span></div>${multiChart(g,mem)}</section>`).join("")}
+  <p class="small muted">Chacun progresse à partir de son propre niveau. Comparez surtout la pente des courbes, pas leur hauteur.</p>
+  <button class="btn quiet" id="refresh">Actualiser</button>`;
+ $("#refresh").onclick=()=>familyView();
+}
+function fmtDay(k){const t=today();if(k===t)return "aujourd'hui";const y=dkey(new Date(Date.now()-864e5));if(k===y)return "hier";const [a,b,c]=k.split("-").map(Number);return new Date(a,b-1,c).toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}
+function multiChart(g,mem){
+ const S=mem.map(m=>({name:m.name,color:m.color,pts:m.res.filter(r=>r.g===g).sort((a,b)=>a.d<b.d?-1:1).slice(-10).map(r=>r.s)})).filter(s=>s.pts.length);
+ if(!S.length)return '<p class="small muted">Personne n\'a encore joué à cet exercice.</p>';
+ const W=320,H=130,pl=40,pr=12,pt=12,pb=22;const all=S.flatMap(s=>s.pts);
+ let mn=Math.min(...all),mx=Math.max(...all);if(mn===mx){mn-=1;mx+=1}
+ const inv=GAMES[g].better==="lower";const len=Math.max(...S.map(s=>s.pts.length));
+ const y=v=>{const f=(v-mn)/(mx-mn);return pt+(inv?f:1-f)*(H-pt-pb)};
+ const x=i=>len===1?(pl+W-pr)/2:pl+i*(W-pl-pr)/(len-1);
+ const best=inv?mn:mx,worst=inv?mx:mn;
+ const svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${GAMES[g].name}, dernières parties de chaque membre">
+  <line x1="${pl}" x2="${W-pr}" y1="${pt}" y2="${pt}" stroke="var(--line)" stroke-dasharray="3 4"/>
+  <line x1="${pl}" x2="${W-pr}" y1="${H-pb}" y2="${H-pb}" stroke="var(--line)"/>
+  <text x="${pl-6}" y="${pt+4}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(Math.round(best))}</text>
+  <text x="${pl-6}" y="${H-pb+4}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(Math.round(worst))}</text>
+  <text x="${pl}" y="${H-5}" font-size="11" fill="var(--muted)">Parties successives, 10 au maximum</text>
+  ${S.map(s=>`${s.pts.length>1?`<path d="${s.pts.map((v,i)=>`${i?"L":"M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`:""}<circle cx="${x(s.pts.length-1).toFixed(1)}" cy="${y(s.pts[s.pts.length-1]).toFixed(1)}" r="4" fill="${s.color}"/>`).join("")}
+ </svg>`;
+ return `<div class="chart">${svg}</div><div class="legend2">${S.map(s=>`<span><i style="background:${s.color}"></i>${esc(s.name)} <span class="muted num">${fmt(s.pts[s.pts.length-1])}</span></span>`).join("")}</div>`;
+}
+
+/* ---------- démarrage ---------- */
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+flush();
+if(new URLSearchParams(location.search).get("famille")&&!D.family)famille();else home();
+})();
+</script>
+</body>
+</html>

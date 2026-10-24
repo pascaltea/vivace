@@ -1,0 +1,43 @@
+# Vivace
+
+Dix minutes par jour pour garder l'esprit rapide. Une web app d'entraînement cognitif pour les 40 ans et plus, gratuite, sans publicité, installable sur l'écran d'accueil.
+
+Quatre exercices adaptatifs :
+
+| Exercice | Capacité travaillée | Unité |
+|---|---|---|
+| Champ visuel | Vitesse de traitement | ms (plus bas = mieux) |
+| Séquence | Mémoire de travail | cases |
+| Aiguillage | Flexibilité mentale (6 niveaux) | points |
+| Liste de courses | Mémoire des événements | mots |
+
+Champ visuel ouvre chaque séance : c'est le type d'entraînement associé à une baisse du risque de démence dans l'étude ACTIVE (suivi sur 20 ans).
+
+## Installer sur un téléphone
+
+- **iPhone** : ouvrir le lien dans Safari, bouton Partager, puis « Sur l'écran d'accueil ».
+- **Android** : ouvrir le lien dans Chrome, menu ⋮, puis « Installer l'application ».
+
+## Groupes famille
+
+L'onglet Famille permet de créer un groupe, d'inviter ses proches avec un code de 8 caractères et de suivre la régularité et les courbes de chacun. Sans compte ni e-mail : le code du groupe sert de clé.
+
+### Activer le partage (une seule fois)
+
+1. Créer un projet gratuit sur [supabase.com](https://supabase.com), région Europe.
+2. Dans **SQL Editor**, coller le contenu de `supabase/schema.sql` et cliquer sur **Run**.
+3. Dans **Project Settings → API**, copier la **Project URL** et la clé **anon public** dans `config.js`.
+
+Sans cette étape, l'app fonctionne normalement mais les résultats restent sur chaque appareil.
+
+## Mise en ligne
+
+Publié avec GitHub Pages depuis la branche `main`, dossier racine (Settings → Pages). Après chaque modification de l'app, incrémenter `VERSION` dans `sw.js` pour que les téléphones récupèrent la nouvelle version.
+
+## Données
+
+- Sur l'appareil : historique, niveaux et réglages (localStorage).
+- Dans le groupe (si activé) : prénom, exercice, score et date de chaque partie. Rien d'autre.
+- Quitter un groupe (Réglages) efface vos résultats partagés.
+
+Vivace n'est pas un dispositif médical.
