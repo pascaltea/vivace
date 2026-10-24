@@ -452,6 +452,20 @@ nav.tabs button[aria-current="page"]{color:var(--ink)}
 .bn{font-weight:500}
 .bn i{width:.55rem!important;height:.55rem!important;border-radius:50%!important}
 .legend2 i{width:.55rem;height:.55rem}
+
+/* ===== couleurs des capacités : quatre clartés distinctes ; soirée chaude ===== */
+:root{--k-corsi:#34349E;--k-list:#9C2B5E;--k-switch:#137A6B;--k-ufov:#E0601F;--accent2:#E0601F;--warm:#E0601F;--s2:#E0601F;--s3:#34349E;--s4:#137A6B;--s5:#9C2B5E}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--k-list:#C24D7E;--k-ufov:#F0703C;--k-corsi:#A7A6FF;--k-switch:#7FE3D2;--s2:#F0703C;--s3:#A7A6FF;--s4:#7FE3D2;--s5:#C24D7E}}
+:root[data-theme="dark"]{--k-list:#C24D7E;--k-ufov:#F0703C;--k-corsi:#A7A6FF;--k-switch:#7FE3D2;--s2:#F0703C;--s3:#A7A6FF;--s4:#7FE3D2;--s5:#C24D7E}
+:root[data-theme="dark"].soir{--bg:#100E0C;--surface:#1A1815;--tint:#24211D;--line:#33302B;--ink:#EFE8DD;--muted:#9A9187;--accent:#EFE8DD;--accent-ink:#100E0C;
+ --accent2:#F08A4B;--warm:#F08A4B;--good:#8CC79A;--bad:#E8836F;--up:#8CC79A;--down:#E8836F;
+ --k-list:#B85A72;--k-ufov:#E8834A;--k-corsi:#B9A5E8;--k-switch:#9ED9B8;--k-ink:#100E0C;
+ --s1:#EFE8DD;--s2:#E8834A;--s3:#B9A5E8;--s4:#9ED9B8;--s5:#B85A72;--s6:#9A9187;
+ --m1:#2B2824;--m2:#3A3631;--m3:#201D1A;--m4:#36322D;--m5:#26231F;color-scheme:dark}
+.rule.par,.rule.mag,.rule.let{background:var(--surface);color:var(--ink);box-shadow:var(--lift)}
+.rule.par{box-shadow:inset 0 0 0 2px var(--k-switch),var(--lift)}
+.rule.mag{box-shadow:inset 0 0 0 2px var(--k-ufov),var(--lift)}
+.rule.let{box-shadow:inset 0 0 0 2px var(--k-corsi),var(--lift)}
 </style>
 </head>
 <body>
@@ -475,8 +489,8 @@ const $=s=>document.querySelector(s);
 const view=$("#view");
 const KEY="vivace-v1";
 
-function fresh(){return {settings:{size:"grand",pace:"calme"},levels:{ufov:500,corsi:3,list:6,switch:1,swVis:1600},history:[],days:{},family:null,pending:[],bilans:[],today:null,name:"",onboarded:false}}
-function load(){try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(r&&r.levels&&r.settings){r.history=r.history.filter(h=>h.g!=="switch"||h.v===2);r.levels.switch=r.levels.switch||1;r.family=r.family||null;r.pending=r.pending||[];r.bilans=r.bilans||[];return r}}catch(e){}return fresh()}
+function fresh(){return {settings:{size:"grand",pace:"calme",theme:"auto"},levels:{ufov:500,corsi:3,list:6,switch:1,swVis:1600},history:[],days:{},family:null,pending:[],bilans:[],today:null,name:"",onboarded:false}}
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(r&&r.levels&&r.settings){r.history=r.history.filter(h=>h.g!=="switch"||h.v===2);r.levels.switch=r.levels.switch||1;r.family=r.family||null;r.pending=r.pending||[];r.bilans=r.bilans||[];r.settings.theme=r.settings.theme||"auto";return r}}catch(e){}return fresh()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
 let D=load();
 document.documentElement.dataset.size=D.settings.size;
@@ -995,13 +1009,13 @@ function science(){
    <div class="card pairs">${P.map(p=>`<div class="pair"><span class="q">${p[0]}</span><span class="a">${p[1]}</span></div>`).join("")}</div>
   </section>
   <section class="card stack ma">
-   <h3>L'esprit Hibi</h3>
+   <h3>Pourquoi ce design</h3>
    <div class="pairs">
-    <div class="pair"><span class="q"><span class="kjt">日々</span> hibi</span><span class="a">« Jour après jour ». Dix minutes chaque jour valent mieux qu'une heure de temps en temps.</span></div>
-    <div class="pair"><span class="q"><span class="kjt">間</span> ma</span><span class="a">Le vide qui laisse respirer. L'écran ne montre que l'essentiel, sans chrono ni bruit.</span></div>
-    <div class="pair"><span class="q"><span class="kjt">金継ぎ</span> kintsugi</span><span class="a">Réparer à l'or ce qui est cassé. Un jour manqué laisse une ligne dorée, pas un compteur remis à zéro.</span></div>
-    <div class="pair"><span class="q"><span class="kjt">判子</span> hanko</span><span class="a">Le sceau rouge qu'on appose pour valider. Chaque séance terminée reçoit le sien : 済, « c'est fait ».</span></div>
-    <div class="pair"><span class="q"><span class="kjt">速 序 転 憶</span></span><span class="a">Les quatre sceaux des exercices : la vitesse, l'ordre, le changement, le souvenir.</span></div>
+    <div class="pair"><span class="q">Hibi, 日々</span><span class="a">« Jour après jour » en japonais. Dix minutes chaque jour valent mieux qu'une heure de temps en temps.</span></div>
+    <div class="pair"><span class="q">Le contraste d'abord</span><span class="a">Après 50 ans, le cristallin jaunit et laisse passer moins de lumière. Le texte est presque noir sur fond clair, et rien ne repose sur la couleur seule.</span></div>
+    <div class="pair"><span class="q">Une seule couleur chaude</span><span class="a">L'orange signale ce qui compte : il se repère vite et reste bien perçu avec l'âge, contrairement aux nuances de bleu.</span></div>
+    <div class="pair"><span class="q">Quatre couleurs, quatre clartés</span><span class="a">Chaque capacité a une couleur plus ou moins foncée que les autres, pour se distinguer même quand le bleu et le vert se confondent.</span></div>
+    <div class="pair"><span class="q">Le soir, moins de bleu</span><span class="a">De 20 h à 7 h, l'app passe en mode sombre et chaud. La lumière bleue réveille, mais le soir elle retarde l'endormissement, et le sommeil compte plus pour la mémoire.</span></div>
    </div>
   </section>
   <p class="note small">Hibi n'est pas un dispositif médical. Si des changements de mémoire vous inquiètent, vous ou un proche, parlez-en à votre médecin.</p>
@@ -1025,6 +1039,7 @@ function settings(){
   <header class="stack" style="gap:.35rem"><p class="eyebrow">Confort</p><h1>Réglages</h1></header>
   <label class="f" for="set-name">Votre prénom<input class="t" id="set-name" autocomplete="given-name" maxlength="40" value="${esc(D.name||"")}" placeholder="Pour vous saluer sur l'accueil"></label>
   <section class="stack" style="gap:.6rem"><h3>Taille du texte</h3>${seg("size",[["normal","Normal"],["grand","Grand"],["tresgrand","Très grand"]])}</section>
+  <section class="stack" style="gap:.6rem"><h3>Apparence</h3>${seg("theme",[["auto","Auto"],["light","Clair"],["dark","Sombre"],["system","Système"]])}<p class="small muted">Auto : clair en journée, sombre et chaud de 20 h à 7 h pour limiter la lumière bleue avant le coucher.</p></section>
   <section class="stack" style="gap:.6rem"><h3>Rythme</h3>${seg("pace",[["calme","Calme"],["standard","Standard"]])}<p class="small muted">Le rythme calme laisse plus de temps pour regarder les séquences et lire la liste. Le temps de Champ visuel s'adapte de toute façon à vous.</p></section>
   <section class="card stack" style="gap:.7rem"><h3>Rappel quotidien</h3><p class="small muted">Ajoute une séance de 10 minutes à votre agenda, tous les jours à l'heure choisie, avec une alerte. Vous pourrez la déplacer ou la supprimer depuis l'agenda.</p>
    <label class="f" for="rem-time">Heure du rappel<input class="t" type="time" id="rem-time" value="${esc(D.remTime||"09:00")}"></label>
@@ -1042,13 +1057,13 @@ function settings(){
  $("#reob").onclick=()=>onboarding(0);
  if(D.family)$("#leave").onclick=()=>{$("#lz").innerHTML=`<div class="confirm"><p>Quitter « ${esc(D.family.name)} » ? Vos résultats seront retirés du groupe. Ils restent sur cet appareil.</p><button class="btn danger" id="lyes">Oui, quitter le groupe</button><button class="btn quiet" id="lno">Annuler</button><p class="err" id="lerr" hidden></p></div>`;
   $("#lyes").onclick=async()=>{try{await rpc("vivace_leave",{p_code:D.family.code,p_member:D.family.memberId});D.family=null;D.pending=[];save();settings()}catch(e){const x=$("#lerr");x.hidden=false;x.textContent=errText(e)}};$("#lno").onclick=settings};
- view.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{D.settings[b.dataset.k]=b.dataset.v;if(b.dataset.k==="size")document.documentElement.dataset.size=b.dataset.v;save();settings()});
+ view.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{D.settings[b.dataset.k]=b.dataset.v;if(b.dataset.k==="size")document.documentElement.dataset.size=b.dataset.v;save();themeNow();settings()});
  $("#reset").onclick=()=>{$("#rz").innerHTML=`<div class="confirm"><p>Effacer tout l'historique, les bilans et revenir aux niveaux de départ ?</p><button class="btn danger" id="yes">Oui, tout effacer</button><button class="btn quiet" id="no">Annuler</button></div>`;
   $("#yes").onclick=()=>{const s=D.settings,f=D.family,nm=D.name;D=fresh();D.settings=s;D.family=f;D.name=nm;D.onboarded=true;save();settings()};$("#no").onclick=settings};
 }
 
 /* ---------- famille : synchronisation ---------- */
-const VERSION="4.0";
+const VERSION="4.1";
 const CFG=window.VIVACE_CONFIG||{};
 const shareOn=()=>!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1180,6 +1195,17 @@ function multiChart(g,mem){
  </svg>`;
  return `<div class="chart">${svg}</div><div class="legend2">${S.map(s=>`<span><i style="background:${s.color}"></i>${esc(s.name)} <span class="muted num">${fmt(s.pts[s.pts.length-1])}</span></span>`).join("")}</div>`;
 }
+
+/* ---------- thème : clair le jour, sombre et chaud le soir ---------- */
+function themeNow(){
+ const t=D.settings.theme||"auto",h=new Date().getHours(),night=h>=20||h<7,r=document.documentElement;
+ const mode=t==="auto"?(night?"soir":"light"):t;
+ if(mode==="system"){delete r.dataset.theme;r.classList.remove("soir")}
+ else if(mode==="soir"){r.dataset.theme="dark";r.classList.add("soir")}
+ else{r.dataset.theme=mode;r.classList.remove("soir")}
+ requestAnimationFrame(()=>{const bg=getComputedStyle(document.body).backgroundColor;document.querySelectorAll('meta[name="theme-color"]').forEach(m=>m.setAttribute("content",bg))});
+}
+themeNow();setInterval(themeNow,60000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)themeNow()});
 
 /* ---------- démarrage ---------- */
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
