@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hibi</title>
 <meta name="description" content="日々, jour après jour. Dix minutes par jour pour garder l'esprit vif après 40 ans.">
-<meta name="theme-color" content="#F6F4EE" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#151412" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F4F4F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B0B0C" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600;700&display=swap">
 <style>
 /* Layout: one calm column (max 34rem), fixed bottom tab bar, large tap targets; games take the full column with nav hidden */
 :root{
@@ -357,6 +357,101 @@ h1{font-weight:600;font-size:2rem}
 .ma{padding:1.5rem 1.3rem}
 .stack-lg{gap:2.1rem}
 .seal{font-family:var(--display)}
+
+/* ===== Hibi · épure : un seul objet, monochrome, une seule couleur ===== */
+:root{--bg:#F4F4F2;--surface:#FFFFFF;--tint:#EBEBE8;--line:#E0E0DC;--ink:#1D1D1F;--muted:#86868B;--accent:#1D1D1F;--accent-ink:#FFFFFF;--accent2:#E2552E;--warm:#E2552E;--good:#2E8B57;--bad:#D14B36;
+ --k-ufov:#E2552E;--k-corsi:#5B5BD6;--k-switch:#2A9D8F;--k-list:#C2507A;--k-ink:#FFFFFF;--up:#2E8B57;--down:#D14B36;
+ --s1:#1D1D1F;--s2:#E2552E;--s3:#5B5BD6;--s4:#2A9D8F;--s5:#C2507A;--s6:#8E8E93;
+ --display:"Hanken Grotesk",system-ui,-apple-system,sans-serif;--body:"Hanken Grotesk",system-ui,-apple-system,sans-serif;
+ --m1:#E6E6E3;--m2:#FBFBFA;--m3:#D8D8D4;--m4:#F6F6F4;--m5:#DEDEDA;--lift:0 1px 2px rgba(20,20,20,.05),0 10px 28px rgba(20,20,20,.05)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0B0B0C;--surface:#161618;--tint:#1F1F22;--line:#2C2C2F;--ink:#F5F5F7;--muted:#8E8E93;--accent:#F5F5F7;--accent-ink:#0B0B0C;--accent2:#FF6A3D;--warm:#FF6A3D;--good:#5DD39E;--bad:#FF7A66;
+ --k-ufov:#FF6A3D;--k-corsi:#8E8CFF;--k-switch:#4FD1C0;--k-list:#F08AB2;--k-ink:#0B0B0C;--up:#5DD39E;--down:#FF7A66;--s1:#F5F5F7;--s2:#FF6A3D;--s3:#8E8CFF;--s4:#4FD1C0;--s5:#F08AB2;--s6:#8E8E93;
+ --m1:#2A2A2D;--m2:#3B3B3F;--m3:#1E1E21;--m4:#37373A;--m5:#242427;--lift:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B0B0C;--surface:#161618;--tint:#1F1F22;--line:#2C2C2F;--ink:#F5F5F7;--muted:#8E8E93;--accent:#F5F5F7;--accent-ink:#0B0B0C;--accent2:#FF6A3D;--warm:#FF6A3D;--good:#5DD39E;--bad:#FF7A66;
+ --k-ufov:#FF6A3D;--k-corsi:#8E8CFF;--k-switch:#4FD1C0;--k-list:#F08AB2;--k-ink:#0B0B0C;--up:#5DD39E;--down:#FF7A66;--s1:#F5F5F7;--s2:#FF6A3D;--s3:#8E8CFF;--s4:#4FD1C0;--s5:#F08AB2;--s6:#8E8E93;
+ --m1:#2A2A2D;--m2:#3B3B3F;--m3:#1E1E21;--m4:#37373A;--m5:#242427;--lift:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);color-scheme:dark}
+body{background:var(--bg);letter-spacing:-.005em;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.big,.bignum span,.digit,.word,.gname h2{font-family:var(--display)}
+h1{font-weight:600;font-size:2.1rem;letter-spacing:-.03em}
+h2{font-weight:600;letter-spacing:-.02em}
+h3{font-weight:600;letter-spacing:-.01em;font-size:1.08rem}
+.eyebrow{text-transform:none;letter-spacing:0;font-weight:400;font-size:.9rem;color:var(--muted)}
+.big{font-weight:200;letter-spacing:-.05em;font-size:4.6rem}
+.unit{font-weight:400}
+.bignum span{font-weight:200;letter-spacing:-.04em}
+.digit{font-weight:200;letter-spacing:-.04em}
+.word{font-weight:400;letter-spacing:-.02em}
+.stack-lg{gap:2.6rem}
+.seal,.stamp,.confetti,.kjt{display:none!important}
+.jp{color:var(--muted);letter-spacing:0}
+/* the one object */
+.hero{background:transparent;color:var(--ink);padding:0;gap:1.6rem;border-radius:0}
+.herotop{flex-direction:column;align-items:center;gap:1.6rem}
+.disc{position:relative;border-radius:50%;max-width:100%;background:conic-gradient(from 200deg,var(--m1),var(--m2) 18%,var(--m3) 40%,var(--m4) 62%,var(--m5) 82%,var(--m1));box-shadow:0 34px 60px rgba(20,20,20,.10),0 2px 4px rgba(20,20,20,.06),inset 0 1px 1px rgba(255,255,255,.7)}
+.disc-in{position:absolute;inset:7.5%;border-radius:50%;background:var(--bg);box-shadow:inset 0 2px 7px rgba(0,0,0,.10),inset 0 -1px 1px rgba(255,255,255,.5)}
+.disc svg{position:absolute;inset:0;width:100%;height:100%}
+.ringarc{transition:stroke-dasharray 1s cubic-bezier(.2,.8,.2,1)}
+.hero .plan li{border-top:1px solid var(--line);padding:.95rem 0;background:transparent}
+.hero .plan li:last-child{border-bottom:1px solid var(--line)}
+.hero .plan li.ok{opacity:.4}
+.plan .pt span{font-size:.88rem;opacity:1;color:var(--muted)}
+.plan .pdone{color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0}
+/* skill marks become quiet dots */
+.pi{width:.6rem!important;height:.6rem!important;border-radius:50%!important;flex:none}
+.pi .kj,.pi svg{display:none}
+.pi.lg{width:.8rem!important;height:.8rem!important}
+.gname{gap:.7rem}
+.tile2 .pi{margin-bottom:.6rem}
+/* surfaces */
+.card,.tile2,.bigcard,.codebox{border:0!important;border-radius:24px;background:var(--surface);box-shadow:var(--lift)}
+.tiles{gap:.75rem;border:0}
+.tile2{min-height:9rem;padding:1.1rem}
+.tile2:nth-child(odd){border-right:0}
+.bilan{background:var(--surface)!important}
+.delta{background:transparent;padding:0;color:var(--muted)}
+.note{border-left:0;padding-left:0}
+.btn{border-radius:99px;font-weight:500;letter-spacing:-.005em;min-height:3.6rem}
+.btn.ghost,.btn.quiet{border:0;background:var(--tint);color:var(--ink)}
+.hero .btn{background:var(--ink);color:var(--bg)}
+.btn.danger{background:var(--bad);color:#fff}
+.seg,.tabs2{border-radius:99px;background:var(--tint)}
+.seg button,.tabs2 button{border-radius:99px}
+.seg button[aria-pressed="true"],.tabs2 button[aria-pressed="true"]{box-shadow:0 1px 3px rgba(0,0,0,.12)}
+input.t{border-radius:16px;border:1px solid var(--line);background:var(--surface)}
+.linkbtn{color:var(--ink);font-weight:500}
+/* week & calendar */
+.week{justify-content:space-between}
+.day i{width:.75rem;height:.75rem;border-radius:50%!important;border:1px solid var(--muted);background:transparent;transform:none!important}
+.day.on i{background:var(--ink);border-color:var(--ink)}
+.day.kin i{border-color:var(--line)}
+.day.today i{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent2) 28%,transparent);border-color:var(--accent2)}
+.day small{font-weight:500}
+.cal i{border-radius:50%} .cal i.on{background:var(--ink)}
+.bt{height:.3rem;border-radius:99px;background:var(--line)} .bt>span{border-radius:99px} .bt.lg{height:.45rem}
+.bt em{width:2px;background:var(--ink)}
+/* navigation */
+nav.tabs{background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:saturate(1.8) blur(22px);-webkit-backdrop-filter:saturate(1.8) blur(22px);border-top:1px solid var(--line)}
+nav.tabs svg{stroke-width:1.5}
+nav.tabs button{font-weight:500}
+nav.tabs button[aria-current="page"]{color:var(--ink)}
+/* exercises */
+.choice{border:0;border-radius:20px;background:var(--surface);box-shadow:var(--lift);font-weight:500}
+.choice:active{transform:scale(.98)}
+#stage.ok,#stage.bad{border-radius:28px}
+.ufov{background:var(--surface);border:0;box-shadow:inset 0 2px 10px rgba(0,0,0,.07)}
+.grid9{background:transparent;padding:0;gap:.8rem}
+.tile{border:0;border-radius:20px;background:var(--surface);box-shadow:var(--lift)}
+.tile.lit{background:var(--accent2)} .tile.tap{background:var(--ink)}
+.rule{border-radius:14px;font-weight:500;letter-spacing:.01em}
+.timebar{height:3px} .timebar i{background:var(--accent2)}
+.illu{border-radius:28px;background:var(--surface)!important;box-shadow:var(--lift)}
+.obart img{border-radius:22%;box-shadow:var(--lift)}
+.ringbig{color:var(--ink)}
+.profhead .bignum small{font-weight:500}
+.mem .wk span{border-radius:99px;height:.35rem}
+.bn{font-weight:500}
+.bn i{width:.55rem!important;height:.55rem!important;border-radius:50%!important}
+.legend2 i{width:.55rem;height:.55rem}
 </style>
 </head>
 <body>
@@ -435,7 +530,7 @@ function show(html,tab){runId++;document.body.classList.remove("playing");if(tab
 function weekDays(){const n=new Date();const off=(n.getDay()+6)%7;const m=new Date(n.getFullYear(),n.getMonth(),n.getDate()-off);return Array.from({length:7},(_,i)=>new Date(m.getFullYear(),m.getMonth(),m.getDate()+i))}
 const KIN='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9 L9 12 L8 15 L13 14 L15 18 L20 16" fill="none" stroke="#B8913A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function weekHTML(){const L=["L","M","M","J","V","S","D"];const t=today();
- return '<div class="week" role="list">'+weekDays().map((d,i)=>{const k=dkey(d);const on=!!D.days[k];return `<div class="day${on?" on":""}${!on&&k<t?" kin":""}${k===t?" today":""}" role="listitem" aria-label="${d.toLocaleDateString("fr-FR",{weekday:"long"})}${on?", séance faite":""}"><i>${on?"済":(k<t?KIN:"")}</i><small>${L[i]}</small></div>`}).join("")+"</div>"}
+ return '<div class="week" role="list">'+weekDays().map((d,i)=>{const k=dkey(d);const on=!!D.days[k];return `<div class="day${on?" on":""}${!on&&k<t?" kin":""}${k===t?" today":""}" role="listitem" aria-label="${d.toLocaleDateString("fr-FR",{weekday:"long"})}${on?", séance faite":""}"><i></i><small>${L[i]}</small></div>`}).join("")+"</div>"}
 function weekCount(){return weekDays().filter(d=>D.days[dkey(d)]).length}
 
 /* ---------- profil & plan du jour ---------- */
@@ -455,13 +550,8 @@ function sessionOrder(){const rest=["corsi","switch","list"];const n=Math.floor(
  return ["ufov"].concat(r)}
 function todayPlan(){if(!D.today||D.today.d!==today()){D.today={d:today(),order:sessionOrder(),done:[]};save()}return D.today}
 const todayDone=()=>todayPlan().done;
-let ensoId=0;
-function ring(n,N,size,label){const f=N?n/N:0,id="br"+(++ensoId),C=2*Math.PI*118,arc=(C*0.9*f).toFixed(1),rot=-62;
- return `<svg class="ring enso" viewBox="0 0 320 320" width="${size}" height="${size}" role="img" aria-label="${n} exercices sur ${N}"><filter id="${id}"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="${size>110?6:4}"/></filter>
- <g filter="url(#${id})" fill="none" stroke-linecap="round"><circle cx="160" cy="160" r="118" stroke="currentColor" stroke-opacity=".12" stroke-width="10"/>
- ${f>0?`<circle class="ringarc" cx="160" cy="160" r="118" stroke="currentColor" stroke-width="20" stroke-dasharray="${arc} ${C.toFixed(1)}" transform="rotate(${rot} 160 160)"/><circle cx="160" cy="160" r="110" stroke="currentColor" stroke-opacity=".6" stroke-width="5" stroke-dasharray="${(arc*0.85).toFixed(1)} ${C.toFixed(1)}" transform="rotate(${rot+8} 160 160)"/><circle cx="160" cy="160" r="126" stroke="currentColor" stroke-opacity=".45" stroke-width="3" stroke-dasharray="30 8 60 6 ${(arc*0.5).toFixed(1)} ${C.toFixed(1)}" transform="rotate(${rot+4} 160 160)"/>`:""}</g>
- ${f>0?`<circle cx="${(160+118*Math.cos(rot*Math.PI/180)).toFixed(1)}" cy="${(160+118*Math.sin(rot*Math.PI/180)).toFixed(1)}" r="12" fill="currentColor" filter="url(#${id})"/>`:""}
- <text x="160" y="${label?168:178}" text-anchor="middle" font-size="64" font-weight="300" fill="currentColor" font-family="Zen Kaku Gothic New, sans-serif">${n}<tspan font-size="34" fill-opacity=".5"> / ${N}</tspan></text>${label?`<text x="160" y="204" text-anchor="middle" font-size="16" letter-spacing="2" fill="currentColor" fill-opacity=".65" font-family="Zen Kaku Gothic New, sans-serif">${label}</text>`:""}</svg>`}
+function ring(n,N,size,label){const f=N?n/N:0,s=size,c=s/2,R=s*0.36,C=2*Math.PI*R,a=(-90+360*f)*Math.PI/180,w=Math.max(2,s/110);
+ return `<div class="disc" style="width:${s}px;height:${s}px"><div class="disc-in"></div><svg viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" role="img" aria-label="${n} exercices sur ${N}"><circle cx="${c}" cy="${c}" r="${R}" fill="none" stroke="var(--line)" stroke-width="${w}"/>${f>0?`<circle class="ringarc" cx="${c}" cy="${c}" r="${R}" fill="none" stroke="var(--ink)" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 ${c} ${c})"/><circle cx="${(c+R*Math.cos(a)).toFixed(1)}" cy="${(c+R*Math.sin(a)).toFixed(1)}" r="${(s/56).toFixed(1)}" fill="var(--accent2)"/>`:""}<text x="${c}" y="${(c+s*0.065).toFixed(1)}" text-anchor="middle" font-size="${(s*0.2).toFixed(1)}" font-weight="200" fill="var(--ink)" letter-spacing="-2" font-family="Hanken Grotesk, system-ui, sans-serif">${n}<tspan fill="var(--muted)"> / ${N}</tspan></text>${label?`<text x="${c}" y="${(c+s*0.16).toFixed(1)}" text-anchor="middle" font-size="${(s*0.05).toFixed(1)}" fill="var(--muted)" font-family="Hanken Grotesk, system-ui, sans-serif">${label}</text>`:""}</svg></div>`}
 function bilanDue(){const b=D.bilans||[];if(!b.length)return "first";const [y,m,d]=b[b.length-1].d.split("-").map(Number);return (Date.now()-new Date(y,m-1,d))/864e5>=28?"monthly":null}
 function profileHTML(){
  const o=overall();const pl=GKEYS.filter(played);
@@ -484,7 +574,7 @@ function home(){
  show(`<div class="stack-lg">
   <header class="hhead"><div class="stack" style="gap:.25rem"><p class="eyebrow">${dateStr}</p><h1>${hello}</h1></div><span class="seal" aria-label="Hibi">日<br>々</span></header>
   <section class="hero" aria-labelledby="h-sess">
-   <div class="herotop"><div class="ringwrap">${ring(n,N,240,"séance du jour")}</div><div class="stack" style="gap:.25rem;min-width:0;text-align:center"><p class="eyebrow">10 minutes · jour après jour</p><h2 id="h-sess">${all?"Séance faite. Bravo !":n?"On reprend où vous en étiez":"Prêt pour aujourd'hui ?"}</h2></div></div>
+   <div class="herotop"><div class="ringwrap">${ring(n,N,280,"exercices aujourd'hui")}</div><div class="stack" style="gap:.25rem;min-width:0;text-align:center"><p class="eyebrow">Dix minutes, chaque jour</p><h2 id="h-sess">${all?"Séance faite. Bravo !":n?"On reprend où vous en étiez":"Prêt pour aujourd'hui ?"}</h2></div></div>
    <ol class="plan">${P.order.map((g,i)=>{const ok=done.includes(g);return `<li class="${ok?"ok":""}"><span class="pi" style="background:${KCOL[g]}">${ok?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>':ICON[g]}</span><span class="pt"><strong>${GAMES[g].name}</strong><span>${GAMES[g].skill}${i===0?" · cœur de la séance":""}</span></span>${ok?'<span class="pdone">fait</span>':""}</li>`}).join("")}</ol>
    <button class="btn" id="go">${all?"Refaire une séance":n?"Continuer : "+GAMES[nextG].name:"Commencer la séance"}</button>
    ${n&&!all?'<p class="small" style="opacity:.85">Faites une pause quand vous voulez : la séance reprend ici.</p>':""}
@@ -494,7 +584,7 @@ function home(){
   <section class="card stack" aria-labelledby="h-week">
    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap"><h3 id="h-week">Cette semaine</h3><span class="muted small num">${wc} jour${wc>1?"s":""} sur 5 visés</span></div>
    ${weekHTML()}
-   <p class="small muted">Un jour manqué n'efface rien. Comme dans le kintsugi, il reste une fine ligne d'or : la reprise compte plus que la cassure.</p>
+   <p class="small muted">Un jour manqué n'efface rien. Ce qui compte, c'est la régularité.</p>
   </section>
   <section class="stack" aria-labelledby="h-free"><h3 id="h-free">Exercices à la carte</h3>
    <div class="tiles">${GKEYS.map(g=>`<button class="tile2" data-g="${g}"><span class="pi" style="background:${KCOL[g]}">${ICON[g]}</span><b>${GAMES[g].name}</b><span class="small muted">${GAMES[g].skill}</span><span class="lvl num">${played(g)?rating(idx(g))+" · "+idx(g):"Nouveau"}</span></button>`).join("")}</div>
@@ -550,7 +640,7 @@ function intro(g){
  const G=GAMES[g];
  show(`<div class="stack-lg">
   <div class="gtop"><button class="linkbtn" id="back">‹ Retour</button><span>${posLabel()}</span></div>
-  <div class="gname"><span class="pi lg" style="background:${KCOL[g]}">${ICON[g]}</span><div><p class="eyebrow">${G.skill} · ${KANJI[g][0]} ${KANJI[g][1]}, ${KANJI[g][2]}</p><h2>${G.name}</h2></div></div>
+  <div class="gname"><span class="pi lg" style="background:${KCOL[g]}">${ICON[g]}</span><div><p class="eyebrow">${G.skill}</p><h2>${G.name}</h2></div></div>
   <div class="illu" style="background:color-mix(in srgb, ${KCOL[g]} 16%, var(--surface))" aria-hidden="true">${G.illu}</div>
   <ol class="steps">${G.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
   <p class="note small muted">${G.why}</p>
@@ -851,7 +941,7 @@ function progress(){
   </section>`;
  }
  show(`<div class="stack-lg">
-  <header class="stack" style="gap:.35rem"><p class="eyebrow"><span class="kjt">進歩</span> shinpo · le progrès</p><h1>Progrès</h1></header>
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Vos courbes</p><h1>Progrès</h1></header>
   ${profileHTML()}
   ${bh}
   <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h3>4 dernières semaines</h3><span class="muted small num">${active} jours actifs sur 28</span></div>
@@ -875,7 +965,7 @@ function science(){
   ["« Des promesses scientifiques exagérées »","Cette page, qui dit ce qu'on sait et ce qu'on ne sait pas."]
  ];
  show(`<div class="stack-lg">
-  <header class="stack" style="gap:.35rem"><p class="eyebrow"><span class="kjt">知</span> chi · le savoir</p><h1>Science</h1></header>
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Ce que dit la recherche</p><h1>Science</h1></header>
   <section class="stack">
    <h3>Ce qui a le plus de preuves</h3>
    <p>L'étude ACTIVE a suivi près de 2 800 personnes âgées pendant 20 ans. Seul l'entraînement à la vitesse de traitement visuel, complété par des séances de rappel, a été associé à un risque de démence plus faible, d'environ 25 %. Les groupes entraînés à la mémoire ou au raisonnement n'ont pas montré cet effet.</p>
@@ -932,7 +1022,7 @@ function settings(){
  const S=D.settings;
  const seg=(k,opts)=>`<div class="seg" role="group">${opts.map(o=>`<button data-k="${k}" data-v="${o[0]}" aria-pressed="${S[k]===o[0]}">${o[1]}</button>`).join("")}</div>`;
  show(`<div class="stack-lg">
-  <header class="stack" style="gap:.35rem"><p class="eyebrow"><span class="kjt">整</span> totonou · ajuster</p><h1>Réglages</h1></header>
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Confort</p><h1>Réglages</h1></header>
   <label class="f" for="set-name">Votre prénom<input class="t" id="set-name" autocomplete="given-name" maxlength="40" value="${esc(D.name||"")}" placeholder="Pour vous saluer sur l'accueil"></label>
   <section class="stack" style="gap:.6rem"><h3>Taille du texte</h3>${seg("size",[["normal","Normal"],["grand","Grand"],["tresgrand","Très grand"]])}</section>
   <section class="stack" style="gap:.6rem"><h3>Rythme</h3>${seg("pace",[["calme","Calme"],["standard","Standard"]])}<p class="small muted">Le rythme calme laisse plus de temps pour regarder les séquences et lire la liste. Le temps de Champ visuel s'adapte de toute façon à vous.</p></section>
@@ -958,7 +1048,7 @@ function settings(){
 }
 
 /* ---------- famille : synchronisation ---------- */
-const VERSION="3.0";
+const VERSION="4.0";
 const CFG=window.VIVACE_CONFIG||{};
 const shareOn=()=>!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -991,7 +1081,7 @@ window.addEventListener("online",flush);
 let famTab=null;
 function famille(){
  if(!shareOn())return show(`<div class="stack-lg">
-  <header class="stack" style="gap:.35rem"><p class="eyebrow"><span class="kjt">家族</span> kazoku · la famille</p><h1>Famille</h1></header>
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Entre proches</p><h1>Famille</h1></header>
   <div class="card stack"><h3>Le partage n'est pas encore activé</h3><p>Cette installation de Hibi n'est reliée à aucune base de données. Les exercices fonctionnent normalement, mais les résultats restent sur cet appareil.</p><p class="small muted">Pour l'activer, renseignez l'adresse et la clé Supabase dans le fichier config.js du dépôt (voir le README).</p></div>
  </div>`,"famille");
  if(!D.family)return joinView();
@@ -1002,7 +1092,7 @@ function joinView(){
  if(famTab===null)famTab=inv?"join":"create";
  const j=famTab==="join";
  show(`<div class="stack-lg">
-  <header class="stack" style="gap:.35rem"><p class="eyebrow"><span class="kjt">家族</span> kazoku · la famille</p><h1>Famille</h1><p class="muted">Créez un groupe, invitez vos proches avec un code, et suivez ensemble la régularité et les progrès de chacun.</p></header>
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Entre proches</p><h1>Famille</h1><p class="muted">Créez un groupe, invitez vos proches avec un code, et suivez ensemble la régularité et les progrès de chacun.</p></header>
   <div class="tabs2" role="group"><button id="t-create" aria-pressed="${!j}">Créer un groupe</button><button id="t-join" aria-pressed="${j}">J'ai un code</button></div>
   <form class="card stack" id="ff" novalidate>
    <label class="f" for="f-name">Votre prénom<input class="t" id="f-name" autocomplete="given-name" maxlength="40" placeholder="Ex. Pascal" value="${esc(D.lastName||D.name||"")}"></label>

@@ -40,6 +40,6 @@ Publié avec GitHub Pages depuis la branche `main`, dossier racine (Settings →
 - Dans le groupe (si activé) : prénom, exercice, score et date de chaque partie. Rien d'autre.
 - Quitter un groupe (Réglages) efface vos résultats partagés.
 
-Le design s'inspire de l'artisanat japonais : encre de Chine (ensō), papier washi, sceaux hanko, kintsugi pour les jours manqués, typographie Mincho.
+Design « épure » : un seul objet par écran (un disque d'aluminium qui se remplit au fil de la séance), monochrome, une seule couleur d'accent, mode sombre soigné.
 
 Hibi n'est pas un dispositif médical.
