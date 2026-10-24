@@ -14,6 +14,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Hibi">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <script src="config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -213,7 +214,7 @@ input.code{text-transform:uppercase;letter-spacing:.18em;font-variant-numeric:ta
 .pi.lg{width:3.4rem;height:3.4rem;border-radius:16px}
 .pi.lg svg{width:1.75rem;height:1.75rem}
 .gname{display:flex;align-items:center;gap:.9rem}
-.gname.sm h3{margin:0}
+.gname.sm h3,.gname.sm .h3{margin:0}
 .hero{gap:1.1rem;padding:1.3rem 1.2rem 1.4rem}
 .herotop{display:flex;align-items:center;gap:1rem}
 .ringwrap{flex:none;color:var(--accent-ink)}
@@ -393,7 +394,10 @@ h3{font-weight:600;letter-spacing:-.01em;font-size:1.08rem}
 .ringarc{transition:stroke-dasharray 1s cubic-bezier(.2,.8,.2,1)}
 .hero .plan li{border-top:1px solid var(--line);padding:.95rem 0;background:transparent}
 .hero .plan li:last-child{border-bottom:1px solid var(--line)}
-.hero .plan li.ok{opacity:.4}
+.hero .plan li.ok{opacity:1}
+.hero .plan li.ok strong{color:var(--muted);font-weight:500;text-decoration:line-through;text-decoration-thickness:1px}
+.hero .plan li.ok .pi{opacity:.45}
+.hero .plan .pdone{color:var(--muted)!important;opacity:1}
 .plan .pt span{font-size:.88rem;opacity:1;color:var(--muted)}
 .plan .pdone{color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0}
 /* skill marks become quiet dots */
@@ -467,6 +471,15 @@ nav.tabs button[aria-current="page"]{color:var(--ink)}
 .rule.mag{box-shadow:inset 0 0 0 2px var(--k-ufov),var(--lift)}
 .rule.let{box-shadow:inset 0 0 0 2px var(--k-corsi),var(--lift)}
 details summary{list-style:none}details summary::-webkit-details-marker{display:none}details summary::before{content:"+ ";color:var(--muted)}details[open] summary::before{content:"− "}
+/* audit : contrastes AA */
+:root{--muted:#66666B;--up:#1E7A45;--down:#B8402C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--muted:#98989D;--up:#5DD39E;--down:#FF7A66}}
+:root[data-theme="dark"]{--muted:#98989D;--up:#5DD39E;--down:#FF7A66}
+:root[data-theme="dark"].soir{--muted:#A39A8F}
+h2.h3{font-size:1.08rem;font-weight:600;letter-spacing:-.01em;line-height:1.15}
+h1.h2{font-size:1.55rem;font-weight:600;letter-spacing:-.02em}
+.st-on{font-weight:600;display:inline-flex;align-items:center;gap:.4rem}
+.st-on::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:var(--accent2)}
 </style>
 </head>
 <body>
@@ -572,7 +585,7 @@ function profileHTML(){
  const o=overall();const pl=GKEYS.filter(played);
  const best=pl.length>1?pl.reduce((a,b)=>idx(b)>idx(a)?b:a):null,weak=pl.length>1?pl.reduce((a,b)=>idx(b)<idx(a)?b:a):null;
  return `<section class="card stack" aria-labelledby="h-prof">
-  <div class="profhead"><div><h3 id="h-prof">Profil cognitif</h3><span class="small muted">Indice Hibi sur 100, d'après votre niveau</span></div>${o!==null?`<div class="bignum"><span class="num">${o}</span><small>${rating(o)}</small></div>`:""}</div>
+  <div class="profhead"><div><h2 class="h3" id="h-prof">Profil cognitif</h2><span class="small muted">Indice Hibi sur 100, d'après votre niveau</span></div>${o!==null?`<div class="bignum"><span class="num">${o}</span><small>${rating(o)}</small></div>`:""}</div>
   <div class="bars">${GKEYS.map(g=>{const p=played(g),v=idx(g);return `<div class="bar"><div class="bl"><span class="bn"><i style="background:${KCOL[g]}"></i>${GAMES[g].skill}</span><span class="num small">${p?`<b>${v}</b> · ${rating(v)}`:'<span class="muted">à évaluer</span>'}</span></div><div class="bt"><span style="width:${p?Math.max(3,v):0}%;background:${KCOL[g]}"></span></div></div>`}).join("")}</div>
   ${best&&best!==weak?`<p class="small"><b>Point fort :</b> ${GAMES[best].skill.toLowerCase()}. <b>À travailler :</b> ${GAMES[weak].skill.toLowerCase()}, placé juste après Champ visuel dans vos séances.</p>`:`<p class="small muted">Le profil se remplit au fil des exercices.</p>`}
  </section>`;
@@ -594,14 +607,14 @@ function home(){
    <button class="btn" id="go">${all?"Refaire une séance":n?"Continuer : "+GAMES[nextG].name:"Commencer la séance"}</button>
    ${n&&!all?'<p class="small" style="opacity:.85">Faites une pause quand vous voulez : la séance reprend ici.</p>':""}
   </section>
-  ${due?`<section class="card stack bilan" aria-labelledby="h-bil"><p class="eyebrow">${due==="first"?"Pour bien démarrer":"Bilan du mois"}</p><h3 id="h-bil">${due==="first"?"Faites votre bilan de départ":"C'est l'heure de votre bilan mensuel"}</h3><p class="small muted">Les 4 exercices à la suite, environ 12 minutes. Il sert de repère pour mesurer vos progrès d'un mois sur l'autre.</p><button class="btn ghost" id="bil">Commencer le bilan</button></section>`:""}
+  ${due?`<section class="card stack bilan" aria-labelledby="h-bil"><p class="eyebrow">${due==="first"?"Pour bien démarrer":"Bilan du mois"}</p><h2 class="h3" id="h-bil">${due==="first"?"Faites votre bilan de départ":"C'est l'heure de votre bilan mensuel"}</h2><p class="small muted">Les 4 exercices à la suite, environ 12 minutes. Il sert de repère pour mesurer vos progrès d'un mois sur l'autre.</p><button class="btn ghost" id="bil">Commencer le bilan</button></section>`:""}
   ${profileHTML()}
   <section class="card stack" aria-labelledby="h-week">
-   ${programHead()}<div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap"><h3 id="h-week">Cette semaine</h3><span class="muted small num">${wc} jour${wc>1?"s":""} sur ${weekGoal()} visés</span></div>
+   ${programHead()}<div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap"><h2 class="h3" id="h-week">Cette semaine</h2><span class="muted small num">${wc} jour${wc>1?"s":""} sur ${weekGoal()} visés</span></div>
    ${weekHTML()}
    <p class="small muted">Un jour manqué n'efface rien. Ce qui compte, c'est la régularité.</p>
   </section>
-  <section class="stack" aria-labelledby="h-free"><h3 id="h-free">Exercices à la carte</h3>
+  <section class="stack" aria-labelledby="h-free"><h2 class="h3" id="h-free">Exercices à la carte</h2>
    <div class="tiles">${GKEYS.map(g=>`<button class="tile2" data-g="${g}"><span class="pi" style="background:${KCOL[g]}">${ICON[g]}</span><b>${GAMES[g].name}</b><span class="small muted">${GAMES[g].skill}</span><span class="lvl num">${played(g)?rating(idx(g))+" · "+idx(g):"Nouveau"}</span></button>`).join("")}</div>
   </section>
  </div>`,"home");
@@ -624,7 +637,7 @@ function onboarding(step){
   <ul class="obl">
    <li><span class="pi" style="background:var(--k-ufov)">${ICON.ufov}</span><span><b>10 minutes par jour</b><br><span class="muted small">4 exercices, une séance que vous pouvez interrompre et reprendre.</span></span></li>
    <li><span class="pi" style="background:var(--k-switch)">${ICON.switch}</span><span><b>La difficulté s'adapte à vous</b><br><span class="muted small">À chaque essai, ni trop facile, ni décourageant.</span></span></li>
-   <li><span class="pi" style="background:var(--k-list)">${ICON.list}</span><span><b>Gratuit, sans publicité</b><br><span class="muted small">Pas de compte à créer. Vos données restent sur votre téléphone.</span></span></li>
+   <li><span class="pi" style="background:var(--k-list)">${ICON.list}</span><span><b>Gratuit, sans publicité</b><br><span class="muted small">Pas de compte à créer. Vos données restent sur votre téléphone, sauf si vous activez la sauvegarde ou un groupe famille.</span></span></li>
   </ul>
   <button class="btn" id="obnext">Continuer</button>
   <button class="linkbtn" id="obrest" style="align-self:center">J'ai déjà un code de sauvegarde</button>
@@ -656,7 +669,7 @@ function intro(g){
  const G=GAMES[g];
  show(`<div class="stack-lg">
   <div class="gtop"><button class="linkbtn" id="back">‹ Retour</button><span>${posLabel()}</span></div>
-  <div class="gname"><span class="pi lg" style="background:${KCOL[g]}">${ICON[g]}</span><div><p class="eyebrow">${G.skill}</p><h2>${G.name}</h2></div></div>
+  <div class="gname"><span class="pi lg" style="background:${KCOL[g]}">${ICON[g]}</span><div><p class="eyebrow">${G.skill}</p><h1 class="h2">${G.name}</h1></div></div>
   <div class="illu" style="background:color-mix(in srgb, ${KCOL[g]} 16%, var(--surface))" aria-hidden="true">${G.illu}</div>
   <ol class="steps">${G.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
   <p class="note small muted">${G.why}</p>
@@ -676,7 +689,7 @@ function shell(g){
  runId++;spoken=new Set();document.body.classList.add("playing");
  view.innerHTML=`<div class="stack">
   <div class="gtop"><button class="linkbtn" id="quit">‹ Quitter</button><span id="trial" class="num"></span></div>
-  <div class="gname"><span class="pi" style="background:${KCOL[g]}">${ICON[g]}</span><h2>${GAMES[g].name}</h2></div>
+  <div class="gname"><span class="pi" style="background:${KCOL[g]}">${ICON[g]}</span><h1 class="h2">${GAMES[g].name}</h1></div>
   <p id="msg"></p>
   <div id="stage"></div>
   <div id="fb" aria-live="polite"></div>
@@ -717,7 +730,7 @@ async function play(g,forcePractice){
  D.history.push({d:today(),g,s:r.score,v:2});
  if(D.history.length>600)D.history=D.history.slice(-600);
  D.days[today()]=true;
- if(session&&!session.bilan){const P=todayPlan();if(!P.done.includes(g))P.done.push(g)}
+ if(session){const P=todayPlan();if(!P.done.includes(g))P.done.push(g)}
  save();
  queue(g,r.score,today());backupSoon();
  if(session)session.results.push({g,score:r.score});
@@ -785,7 +798,7 @@ RUN.corsi=async function(id){
  }
  if(PR)return {practice:true};
  D.levels.corsi=Math.max(3,best);
- return {score:best,lines:[`Plus longue séquence réussie : ${best} cases`,`${n} séquences jouées`,"Entre 5 et 7 cases, vous êtes dans la moyenne adulte."]};
+ return {score:best,lines:[`Plus longue séquence réussie : ${best} cases`,`${n} séquences jouées`,"Comparez-vous surtout à vous-même : la longueur augmente avec l'entraînement."]};
 };
 
 /* ---------- 3. Aiguillage ---------- */
@@ -926,7 +939,7 @@ function done(){
   const prevB=(D.bilans||[]).slice(-1)[0];
   D.bilans=(D.bilans||[]).concat([{d:today(),idx:now}]);save();
   const ov=Object.values(now).length?Math.round(avg(Object.values(now))):null;
-  bil=`<section class="card stack"><div class="profhead"><div><h3>Votre bilan du ${fmtDay(today())}</h3><span class="small muted">${prevB?"Comparé au bilan du "+fmtDay(prevB.d):"Votre point de départ"}</span></div>${ov!==null?`<div class="bignum"><span class="num">${ov}</span><small>${rating(ov)}</small></div>`:""}</div>
+  bil=`<section class="card stack"><div class="profhead"><div><h2 class="h3">Votre bilan du ${fmtDay(today())}</h2><span class="small muted">${prevB?"Comparé au bilan du "+fmtDay(prevB.d):"Votre point de départ"}</span></div>${ov!==null?`<div class="bignum"><span class="num">${ov}</span><small>${rating(ov)}</small></div>`:""}</div>
    <div class="bars">${GKEYS.map(g=>{const v=now[g];if(v===undefined)return "";const p=prevB&&prevB.idx[g]!==undefined?prevB.idx[g]:null;const d=p===null?null:v-p;return `<div class="bar"><div class="bl"><span class="bn"><i style="background:${KCOL[g]}"></i>${GAMES[g].skill}</span><span class="num small"><b>${v}</b>${d!==null?` <span class="${d>0?"up":d<0?"down":"muted"}">${d>0?"+":""}${d}</span>`:""}</span></div><div class="bt"><span class="grow" style="width:${Math.max(3,v)}%;background:${KCOL[g]}"></span>${p!==null&&d!==0?`<em style="left:${p}%"></em>`:""}</div></div>`}).join("")}</div>
    <p class="small muted">Prochain bilan conseillé dans 4 semaines. Hibi vous le proposera sur l'accueil.</p></section>`;
  }
@@ -935,7 +948,7 @@ function done(){
   ${confetti()}
   <div class="donehead"><div class="ringbig">${ring(S.bilan?res.length:P.done.length,S.bilan?4:P.order.length,200,S.bilan?"bilan":"aujourd'hui")}<span class="stamp" aria-hidden="true">済</span></div><p class="eyebrow">${S.bilan?"Bilan terminé":"Séance terminée"}</p><h1>${S.bilan?"Merci, c'est noté.":"Bien joué"+(D.name?", "+esc(D.name):"")+"."}</h1><p class="muted">${S.bilan?"Voici votre repère du jour.":wc>=weekGoal()?"Objectif de la semaine atteint. Tout ce qui vient en plus est du bonus.":`Encore ${weekGoal()-wc} jour${weekGoal()-wc>1?"s":""} cette semaine pour atteindre l'objectif.`}</p></div>
   ${bil}
-  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h3>Cette semaine</h3><span class="muted small num">${wc} / ${weekGoal()} jours</span></div>${weekHTML()}</section>
+  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h2 class="h3">Cette semaine</h2><span class="muted small num">${wc} / ${weekGoal()} jours</span></div>${weekHTML()}</section>
   ${res.length&&!S.bilan?`<section class="card rows" style="padding-block:.3rem">${res.map(x=>`<div class="row"><span class="pi" style="background:${KCOL[x.g]}">${ICON[x.g]}</span><span class="t"><b>${GAMES[x.g].name}</b><span>${GAMES[x.g].skill}</span></span><span class="num"><b>${fmt(x.score)}</b> <span class="muted small">${GAMES[x.g].unit}</span></span></div>`).join("")}</section>`:""}
   <p class="note small muted">Pour aller plus loin aujourd'hui, le plus utile n'est pas un exercice de plus : une marche rapide de 20 minutes ou un appel à quelqu'un fait autant pour le cerveau.</p>
   <button class="btn" id="h">Retour à l'accueil</button>
@@ -973,7 +986,7 @@ function progress(){
  let bh="";
  if(B.length){
   const o=x=>{const v=Object.values(x.idx);return v.length?Math.round(avg(v)):null};
-  bh=`<section class="card stack" style="gap:.6rem"><h3>Vos bilans</h3>
+  bh=`<section class="card stack" style="gap:.6rem"><h2 class="h3">Vos bilans</h2>
    <div class="rows">${B.slice(-6).reverse().map(b=>`<div class="row" style="min-height:3rem"><span class="t"><b>${fmtDay(b.d)}</b></span><span class="num"><b>${o(b)??"–"}</b> <span class="small muted">${o(b)!==null?rating(o(b)):""}</span></span></div>`).join("")}</div>
    ${B.length>1?`<p class="small">Depuis votre premier bilan : <b class="${o(last)-o(first)>=0?"up":"down"}">${o(last)-o(first)>=0?"+":""}${o(last)-o(first)}</b> points d'indice global.</p>`:`<p class="small muted">${bilanDue()?"Votre prochain bilan est disponible sur l'accueil.":"Prochain bilan proposé 4 semaines après le premier."}</p>`}
   </section>`;
@@ -983,11 +996,11 @@ function progress(){
   ${profileHTML()}
   ${programCard()}
   ${bh}
-  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h3>4 dernières semaines</h3><span class="muted small num">${active} jours actifs sur 28</span></div>
+  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h2 class="h3">4 dernières semaines</h2><span class="muted small num">${active} jours actifs sur 28</span></div>
    <div class="cal" aria-label="Calendrier des 28 derniers jours">${days.map(d=>`<i class="${D.days[dkey(d)]?"on":""}" title="${d.toLocaleDateString("fr-FR")}"></i>`).join("")}</div>
    <p class="small muted">Objectif de la phase en cours : ${weekGoal()} jours par semaine.</p></section>
   <p class="small muted">Sur chaque courbe, plus haut veut dire mieux. Le dernier point est plus gros.</p>
-  ${GKEYS.map(g=>{const l=lastOf(g);return `<section class="card stack" style="gap:.6rem"><div class="gname sm"><span class="pi" style="background:${KCOL[g]}">${ICON[g]}</span><div style="flex:1;min-width:0"><h3>${GAMES[g].name}</h3><span class="small muted">${GAMES[g].skill}</span></div>${l?`<span class="num"><b style="font-size:1.25rem">${fmt(l.s)}</b> <span class="small muted">${GAMES[g].unit}</span></span>`:""}</div>${chart(g)}</section>`}).join("")}
+  ${GKEYS.map(g=>{const l=lastOf(g);return `<section class="card stack" style="gap:.6rem"><div class="gname sm"><span class="pi" style="background:${KCOL[g]}">${ICON[g]}</span><div style="flex:1;min-width:0"><h2 class="h3">${GAMES[g].name}</h2><span class="small muted">${GAMES[g].skill}</span></div>${l?`<span class="num"><b style="font-size:1.25rem">${fmt(l.s)}</b> <span class="small muted">${GAMES[g].unit}</span></span>`:""}</div>${chart(g)}</section>`}).join("")}
  </div>`,"progress");
 }
 
@@ -1006,20 +1019,21 @@ function science(){
  show(`<div class="stack-lg">
   <header class="stack" style="gap:.35rem"><p class="eyebrow">Ce que dit la recherche</p><h1>Science</h1></header>
   <section class="stack">
-   <h3>Ce qui a le plus de preuves</h3>
+   <h2 class="h3">Ce qui a le plus de preuves</h2>
    <p>L'étude ACTIVE a suivi près de 2 800 personnes âgées pendant 20 ans. Seul l'entraînement à la vitesse de traitement visuel, complété par des séances de rappel, a été associé à un risque de démence plus faible, d'environ 25 %. Les groupes entraînés à la mémoire ou au raisonnement n'ont pas montré cet effet.</p>
-   <p>C'est pour ça que <strong>Champ visuel</strong> ouvre chaque séance et ajuste sa difficulté en continu.</p>
+   <p>C'est pour ça que <strong>Champ visuel</strong> ouvre chaque séance et ajuste sa difficulté en continu. Il s'inspire de cet entraînement mais n'a pas été testé lui-même dans un essai clinique.</p>
   </section>
   <section class="stack">
-   <h3>Ce qu'il faut savoir</h3>
+   <h2 class="h3">Ce qu'il faut savoir</h2>
    <ul class="plain">
     <li>On progresse d'abord sur les exercices entraînés. Le bénéfice dans la vie quotidienne est plus limité et varie selon les personnes.</li>
     <li>Ces résultats concernent des personnes en bonne santé. Il s'agit de retarder un déclin, pas de traiter une maladie.</li>
     <li>La régularité compte plus que la durée : de courtes séances sur plusieurs semaines, avec des reprises.</li>
+    <li>L'indice Hibi et les niveaux (Débutant à Expert) sont des repères internes pour suivre vos progrès, pas une mesure médicale ni une comparaison avec d'autres personnes.</li>
    </ul>
   </section>
   <section class="card stack">
-   <h3>Les autres leviers, souvent plus puissants</h3>
+   <h2 class="h3">Les autres leviers, souvent plus puissants</h2>
    <ul class="plain">
     <li><strong>Bouger</strong> : marche rapide, vélo, natation, plusieurs fois par semaine.</li>
     <li><strong>Dormir</strong> : un sommeil régulier aide la mémoire à se consolider.</li>
@@ -1029,12 +1043,12 @@ function science(){
    </ul>
   </section>
   <section class="stack">
-   <h3>Ce que les avis des utilisateurs ont changé</h3>
+   <h2 class="h3">Ce que les avis des utilisateurs ont changé</h2>
    <p class="small muted">Plaintes qui reviennent dans les avis des grandes applis d'entraînement cérébral, et la réponse de Hibi.</p>
    <div class="card pairs">${P.map(p=>`<div class="pair"><span class="q">${p[0]}</span><span class="a">${p[1]}</span></div>`).join("")}</div>
   </section>
   <section class="card stack ma">
-   <h3>Pourquoi ce design</h3>
+   <h2 class="h3">Pourquoi ce design</h2>
    <div class="pairs">
     <div class="pair"><span class="q">Hibi, 日々</span><span class="a">« Jour après jour » en japonais. Dix minutes chaque jour valent mieux qu'une heure de temps en temps.</span></div>
     <div class="pair"><span class="q">Le contraste d'abord</span><span class="a">Après 50 ans, le cristallin jaunit et laisse passer moins de lumière. Le texte est presque noir sur fond clair, et rien ne repose sur la couleur seule.</span></div>
@@ -1063,17 +1077,17 @@ function settings(){
  show(`<div class="stack-lg">
   <header class="stack" style="gap:.35rem"><p class="eyebrow">Confort</p><h1>Réglages</h1></header>
   <label class="f" for="set-name">Votre prénom<input class="t" id="set-name" autocomplete="given-name" maxlength="40" value="${esc(D.name||"")}" placeholder="Pour vous saluer sur l'accueil"></label>
-  <section class="stack" style="gap:.6rem"><h3>Taille du texte</h3>${seg("size",[["normal","Normal"],["grand","Grand"],["tresgrand","Très grand"]])}</section>
-  <section class="stack" style="gap:.6rem"><h3>Apparence</h3>${seg("theme",[["auto","Auto"],["light","Clair"],["dark","Sombre"],["system","Système"]])}<p class="small muted">Auto : clair en journée, sombre et chaud de 20 h à 7 h pour limiter la lumière bleue avant le coucher.</p></section>
-  <section class="stack" style="gap:.6rem"><h3>Rythme</h3>${seg("pace",[["calme","Calme"],["standard","Standard"]])}<p class="small muted">Le rythme calme laisse plus de temps pour regarder les séquences et lire la liste. Le temps de Champ visuel s'adapte de toute façon à vous.</p></section>
-  <section class="stack" style="gap:.6rem"><h3>Voix</h3>${seg("voice",[["off","Consignes à lire"],["on","Consignes lues à voix haute"]])}<p class="small muted">${canSpeak?"La voix lit chaque consigne au début des exercices. Vous pouvez aussi toucher « Écouter la consigne » avant chaque exercice.":"Ce navigateur ne permet pas la lecture à voix haute."}</p></section>
+  <section class="stack" style="gap:.6rem"><h2 class="h3">Taille du texte</h2>${seg("size",[["normal","Normal"],["grand","Grand"],["tresgrand","Très grand"]])}</section>
+  <section class="stack" style="gap:.6rem"><h2 class="h3">Apparence</h2>${seg("theme",[["auto","Auto"],["light","Clair"],["dark","Sombre"],["system","Système"]])}<p class="small muted">Auto : clair en journée, sombre et chaud de 20 h à 7 h pour limiter la lumière bleue avant le coucher.</p></section>
+  <section class="stack" style="gap:.6rem"><h2 class="h3">Rythme</h2>${seg("pace",[["calme","Calme"],["standard","Standard"]])}<p class="small muted">Le rythme calme laisse plus de temps pour regarder les séquences et lire la liste. Le temps de Champ visuel s'adapte de toute façon à vous.</p></section>
+  <section class="stack" style="gap:.6rem"><h2 class="h3">Voix</h2>${seg("voice",[["off","Consignes à lire"],["on","Consignes lues à voix haute"]])}<p class="small muted">${canSpeak?"La voix lit chaque consigne au début des exercices. Vous pouvez aussi toucher « Écouter la consigne » avant chaque exercice.":"Ce navigateur ne permet pas la lecture à voix haute."}</p></section>
   ${backupSection()}
-  <section class="card stack" style="gap:.7rem"><h3>Rappels du programme</h3><p class="small muted">Ajoute votre programme à l'agenda, avec une alerte à l'heure choisie : du lundi au vendredi pendant la fondation, puis le mardi et le samedi, et une semaine de rappel aux 3ᵉ, 6ᵉ et 12ᵉ mois.</p>
+  <section class="card stack" style="gap:.7rem"><h2 class="h3">Rappels du programme</h2><p class="small muted">Ajoute votre programme à l'agenda, avec une alerte à l'heure choisie : du lundi au vendredi pendant la fondation, puis le mardi et le samedi, et une semaine de rappel aux 3ᵉ, 6ᵉ et 12ᵉ mois.</p>
    <label class="f" for="rem-time">Heure du rappel<input class="t" type="time" id="rem-time" value="${esc(D.remTime||"09:00")}"></label>
    <a class="btn" id="rem" href="#" download="hibi-programme.ics">Ajouter mon programme à l'agenda</a></section>
-  <section class="card stack" style="gap:.6rem"><h3>Bilan</h3><p class="small muted">${(D.bilans||[]).length?`Dernier bilan : ${fmtDay(D.bilans[D.bilans.length-1].d)}.`:"Pas encore de bilan."} Un bilan par mois suffit.</p><button class="btn ghost" id="sbil">Faire un bilan maintenant</button></section>
-  <section class="card stack" style="gap:.6rem"><h3>Niveaux actuels</h3><ul class="plain num">${GKEYS.map(g=>`<li>${GAMES[g].name} : ${levelText(g)}</li>`).join("")}</ul></section>
-  <section class="stack" style="gap:.6rem"><h3>Vos données</h3><p class="small muted">${D.family?`Vos résultats sont enregistrés sur cet appareil et partagés avec le groupe « ${esc(D.family.name)} ». Seules les personnes qui ont le code du groupe les voient.`:"Tout reste sur cet appareil. Rien n'est envoyé tant que vous ne rejoignez pas un groupe famille."}</p><div id="rz"><button class="btn ghost" id="reset">Effacer mes résultats sur cet appareil</button></div>${D.family?'<div id="lz"><button class="btn ghost" id="leave">Quitter le groupe et effacer mes résultats partagés</button></div>':""}</section>
+  <section class="card stack" style="gap:.6rem"><h2 class="h3">Bilan</h2><p class="small muted">${(D.bilans||[]).length?`Dernier bilan : ${fmtDay(D.bilans[D.bilans.length-1].d)}.`:"Pas encore de bilan."} Un bilan par mois suffit.</p><button class="btn ghost" id="sbil">Faire un bilan maintenant</button></section>
+  <section class="card stack" style="gap:.6rem"><h2 class="h3">Niveaux actuels</h2><ul class="plain num">${GKEYS.map(g=>`<li>${GAMES[g].name} : ${levelText(g)}</li>`).join("")}</ul></section>
+  <section class="stack" style="gap:.6rem"><h2 class="h3">Vos données</h2><p class="small muted">${D.family?`Vos résultats sont enregistrés sur cet appareil et partagés avec le groupe « ${esc(D.family.name)} ». Seules les personnes qui ont le code du groupe les voient.`:"Vos résultats sont enregistrés sur cet appareil."}${D.backup?" Une copie est sauvegardée avec votre code de sauvegarde.":""} Hibi ne collecte ni e-mail, ni localisation, ni publicité. Seuls votre prénom, vos scores et leurs dates sont envoyés, et uniquement si vous activez la sauvegarde ou un groupe famille.</p><div id="rz"><button class="btn ghost" id="reset">Effacer mes résultats sur cet appareil</button></div>${D.family?'<div id="lz"><button class="btn ghost" id="leave">Quitter le groupe et effacer mes résultats partagés</button></div>':""}</section>
   <button class="linkbtn" id="reob" style="align-self:flex-start">Revoir la présentation de Hibi</button>
   <p class="small muted">Hibi · version ${VERSION}</p>
  </div>`,"settings");
@@ -1087,11 +1101,11 @@ function settings(){
   $("#lyes").onclick=async()=>{try{await rpc("vivace_leave",{p_code:D.family.code,p_member:D.family.memberId});D.family=null;D.pending=[];save();settings()}catch(e){const x=$("#lerr");x.hidden=false;x.textContent=errText(e)}};$("#lno").onclick=settings};
  view.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{D.settings[b.dataset.k]=b.dataset.v;if(b.dataset.k==="size")document.documentElement.dataset.size=b.dataset.v;save();themeNow();settings()});
  $("#reset").onclick=()=>{$("#rz").innerHTML=`<div class="confirm"><p>Effacer tout l'historique, les bilans et revenir aux niveaux de départ ?</p><button class="btn danger" id="yes">Oui, tout effacer</button><button class="btn quiet" id="no">Annuler</button></div>`;
-  $("#yes").onclick=()=>{const s=D.settings,f=D.family,nm=D.name;D=fresh();D.settings=s;D.family=f;D.name=nm;D.onboarded=true;save();settings()};$("#no").onclick=settings};
+  $("#yes").onclick=()=>{const s=D.settings,f=D.family,nm=D.name,bk=D.backup;D=fresh();D.settings=s;D.family=f;D.name=nm;D.backup=bk||null;D.onboarded=true;save();backupSoon();settings()};$("#no").onclick=settings};
 }
 
 /* ---------- famille : synchronisation ---------- */
-const VERSION="5.0";
+const VERSION="5.1";
 const CFG=window.VIVACE_CONFIG||{};
 const shareOn=()=>!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1127,7 +1141,7 @@ let famTab=null;
 function famille(){
  if(!shareOn())return show(`<div class="stack-lg">
   <header class="stack" style="gap:.35rem"><p class="eyebrow">Entre proches</p><h1>Famille</h1></header>
-  <div class="card stack"><h3>Le partage n'est pas encore activé</h3><p>Cette installation de Hibi n'est reliée à aucune base de données. Les exercices fonctionnent normalement, mais les résultats restent sur cet appareil.</p><p class="small muted">Pour l'activer, renseignez l'adresse et la clé Supabase dans le fichier config.js du dépôt (voir le README).</p></div>
+  <div class="card stack"><h2 class="h3">Le partage n'est pas encore activé</h2><p>Cette installation de Hibi n'est reliée à aucune base de données. Les exercices fonctionnent normalement, mais les résultats restent sur cet appareil.</p><p class="small muted">Pour l'activer, renseignez l'adresse et la clé Supabase dans le fichier config.js du dépôt (voir le README).</p></div>
  </div>`,"famille");
  if(!D.family)return joinView();
  return familyView();
@@ -1197,10 +1211,10 @@ async function familyView(fresh){
   return `<div class="mem"><span class="nm"><i style="background:${m.color}"></i><span style="min-width:0;overflow-wrap:anywhere">${esc(m.name)}</span>${m.me?'<span class="you">vous</span>':""}</span><span class="num small"><b>${n}</b> / 5 jours</span><div class="wk" aria-label="${n} jours actifs cette semaine">${wk.map(k=>`<span class="${days.has(k)?"on":""}"></span>`).join("")}</div><span class="small muted" style="grid-column:1/-1">${last?"Dernière séance : "+fmtDay(last):"Pas encore de séance"}</span></div>`}).join("");
  const total=mem.reduce((s,m)=>s+wk.filter(k=>m.res.some(r=>r.d===k)).length,0),goal=mem.length*5;
  box.innerHTML=`
-  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;flex-wrap:wrap"><h3>Cette semaine</h3><span class="small muted num">${total} jours actifs sur ${goal} visés à ${mem.length}</span></div>
+  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;flex-wrap:wrap"><h2 class="h3">Cette semaine</h2><span class="small muted num">${total} jours actifs sur ${goal} visés à ${mem.length}</span></div>
    <div>${memRows||'<p class="muted">Personne pour l\'instant.</p>'}</div>
    ${mem.length<2?'<p class="small muted">Invitez un proche pour commencer à vous suivre mutuellement.</p>':""}</section>
-  ${Object.keys(GAMES).map(g=>`<section class="card stack" style="gap:.6rem"><div><h3>${GAMES[g].name}</h3><span class="small muted">${GAMES[g].skill} · ${GAMES[g].better==="lower"?"en "+GAMES[g].unit+", plus haut sur la courbe = plus rapide":GAMES[g].unit+", plus haut = mieux"}</span></div>${multiChart(g,mem)}</section>`).join("")}
+  ${Object.keys(GAMES).map(g=>`<section class="card stack" style="gap:.6rem"><div><h2 class="h3">${GAMES[g].name}</h2><span class="small muted">${GAMES[g].skill} · ${GAMES[g].better==="lower"?"en "+GAMES[g].unit+", plus haut sur la courbe = plus rapide":GAMES[g].unit+", plus haut = mieux"}</span></div>${multiChart(g,mem)}</section>`).join("")}
   <p class="small muted">Chacun progresse à partir de son propre niveau. Comparez surtout la pente des courbes, pas leur hauteur.</p>
   <button class="btn quiet" id="refresh">Actualiser</button>`;
  $("#refresh").onclick=()=>familyView();
@@ -1252,15 +1266,15 @@ function programHead(){
 }
 function programCard(){
  const s=programStart();
- if(!s)return `<section class="card stack"><h3>Votre programme</h3><p class="small muted">Il démarre avec votre première séance : 8 semaines de fondation, puis un entretien léger et des semaines de rappel.</p></section>`;
+ if(!s)return `<section class="card stack"><h2 class="h3">Votre programme</h2><p class="small muted">Il démarre avec votre première séance : 8 semaines de fondation, puis un entretien léger et des semaines de rappel.</p></section>`;
  const w=programWeek(),ph=phaseOf(w),n=foundationDone();
  const end=weekDate(9);end.setDate(end.getDate()-1);
  const rows=[
   {t:"Fondation",d:`5 séances par semaine, du ${fmtShort(s)} au ${fmtShort(end)}`,st:w>8?"fait":ph==="fondation"?"en cours":""},
   {t:"Entretien",d:"2 séances par semaine",st:ph==="entretien"?"en cours":w>8?"":""}]
   .concat(BOOST_WEEKS.map((b,i)=>({t:`Rappel ${["du 3ᵉ mois","du 6ᵉ mois","du 12ᵉ mois"][i]}`,d:`5 séances la semaine du ${fmtShort(weekDate(b))}`,st:w>b?"fait":w===b?"en cours":""})));
- return `<section class="card stack" style="gap:.6rem"><div class="profhead"><div><h3>Votre programme</h3><span class="small muted">Inspiré de l'étude ACTIVE : un entraînement régulier, puis des séances de rappel.</span></div>${ph==="fondation"?`<div class="bignum"><span class="num">${n}</span><small>sur 40</small></div>`:""}</div>
-  <div class="rows">${rows.map(r=>`<div class="row" style="min-height:3.2rem"><span class="t"><b>${r.t}</b><span>${r.d}</span></span><span class="small ${r.st==="en cours"?"":"muted"}" style="${r.st==="en cours"?"color:var(--accent2);font-weight:600":""}">${r.st}</span></div>`).join("")}</div></section>`;
+ return `<section class="card stack" style="gap:.6rem"><div class="profhead"><div><h2 class="h3">Votre programme</h2><span class="small muted">Inspiré de l'étude ACTIVE : un entraînement régulier, puis des séances de rappel.</span></div>${ph==="fondation"?`<div class="bignum"><span class="num">${n}</span><small>sur 40</small></div>`:""}</div>
+  <div class="rows">${rows.map(r=>`<div class="row" style="min-height:3.2rem"><span class="t"><b>${r.t}</b><span>${r.d}</span></span><span class="small ${r.st==="en cours"?"st-on":"muted"}">${r.st}</span></div>`).join("")}</div></section>`;
 }
 function programIcs(time){
  const [hh,mm]=time.split(":").map(Number);const z=n=>String(n).padStart(2,"0");
@@ -1292,11 +1306,11 @@ async function backupNow(){if(!D.backup)return false;try{await rpc("vivace_backu
 function backupSection(){
  if(!shareOn())return "";
  const B=D.backup;
- return `<section class="card stack" style="gap:.7rem" id="bk"><h3>Sauvegarde</h3>
+ return `<section class="card stack" style="gap:.7rem" id="bk"><h2 class="h3">Sauvegarde</h2>
   ${B?`<p class="small muted">Vos résultats sont sauvegardés automatiquement après chaque exercice. Gardez ce code : il permet de les retrouver sur un autre téléphone.</p>
    <div class="codebox"><span><span class="small muted">Votre code de sauvegarde</span><br><b>${fmtCode(B.code)}</b></span><button class="btn quiet" id="bk-copy" style="width:auto;padding-inline:1.2rem">Copier</button></div>
    <p class="small muted" id="bk-status">${B.last?"Dernière sauvegarde : "+new Date(B.last).toLocaleString("fr-FR",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"Pas encore de sauvegarde."}</p>
-   <button class="btn quiet" id="bk-now">Sauvegarder maintenant</button>`
+   <button class="btn quiet" id="bk-now">Sauvegarder maintenant</button><div id="bkd"><button class="linkbtn" id="bk-del">Supprimer ma sauvegarde du serveur</button></div>`
   :`<p class="small muted">Aujourd'hui, vos résultats ne vivent que dans ce téléphone. Activez la sauvegarde pour les retrouver si vous changez d'appareil. Pas de compte : un code de 12 caractères suffit.</p><button class="btn" id="bk-on">Activer la sauvegarde</button>`}
   <details><summary class="small" style="cursor:pointer;font-weight:600">Récupérer mes résultats avec un code</summary>
    <div class="stack" style="gap:.6rem;margin-top:.7rem"><label class="f" for="bk-in">Code de sauvegarde<input class="t code" id="bk-in" maxlength="14" autocomplete="off" autocapitalize="characters" placeholder="XXXX-XXXX-XXXX"></label>
@@ -1309,6 +1323,8 @@ function wireBackup(){
  const on=$("#bk-on");if(on)on.onclick=async()=>{on.disabled=true;on.textContent="Un instant…";D.backup={code:newBackupCode(),last:null};save();const ok=await backupNow();if(!ok){const e=D.backup.error;D.backup=null;save();settings();const r=$("#bk");if(r)r.insertAdjacentHTML("beforeend",`<p class="err">${esc(e||"La sauvegarde a échoué.")}</p>`);return}settings();setTimeout(()=>{const b=$("#bk");if(b)b.scrollIntoView({block:"center"})},50)};
  const cp=$("#bk-copy");if(cp)cp.onclick=async()=>{try{await navigator.clipboard.writeText(fmtCode(D.backup.code));cp.textContent="Copié"}catch(e){cp.textContent="Sélectionnez le code"}};
  const now=$("#bk-now");if(now)now.onclick=async()=>{now.disabled=true;now.textContent="Sauvegarde…";const ok=await backupNow();$("#bk-status").textContent=ok?"Sauvegardé à l'instant.":D.backup.error;now.disabled=false;now.textContent="Sauvegarder maintenant"};
+ const del=$("#bk-del");if(del)del.onclick=()=>{$("#bkd").innerHTML=`<div class="confirm"><p>Supprimer définitivement la copie en ligne ? Vos résultats restent sur ce téléphone.</p><button class="btn danger" id="bkd-yes">Oui, supprimer</button><button class="btn quiet" id="bkd-no">Annuler</button><p class="err" id="bkd-err" hidden></p></div>`;
+  $("#bkd-no").onclick=settings;$("#bkd-yes").onclick=async()=>{try{await rpc("vivace_backup_delete",{p_code:D.backup.code});D.backup=null;save();settings()}catch(e){const x=$("#bkd-err");x.hidden=false;x.textContent=errText(e)}}};
  const ld=$("#bk-load");if(ld)ld.onclick=async()=>{
   const res=$("#bk-res");const code=$("#bk-in").value.toUpperCase().replace(/[^A-Z0-9]/g,"");
   if(code.length!==12){res.innerHTML='<p class="err">Le code fait 12 caractères.</p>';return}
