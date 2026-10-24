@@ -1,6 +1,6 @@
-# Vivace
+# Hibi 日々
 
-Dix minutes par jour pour garder l'esprit rapide. Une web app d'entraînement cognitif pour les 40 ans et plus, gratuite, sans publicité, installable sur l'écran d'accueil.
+« Jour après jour ». Dix minutes par jour pour garder l'esprit vif. Une web app d'entraînement cognitif pour les 40 ans et plus, gratuite, sans publicité, installable sur l'écran d'accueil.
 
 Quatre exercices adaptatifs :
 
@@ -40,4 +40,6 @@ Publié avec GitHub Pages depuis la branche `main`, dossier racine (Settings →
 - Dans le groupe (si activé) : prénom, exercice, score et date de chaque partie. Rien d'autre.
 - Quitter un groupe (Réglages) efface vos résultats partagés.
 
-Vivace n'est pas un dispositif médical.
+Le design s'inspire de l'artisanat japonais : encre de Chine (ensō), papier washi, sceaux hanko, kintsugi pour les jours manqués, typographie Mincho.
+
+Hibi n'est pas un dispositif médical.

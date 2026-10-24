@@ -1,5 +1,5 @@
 // Vivace : fonctionne hors ligne. Changer VERSION à chaque mise en ligne.
-const VERSION = "vivace-2.0";
+const VERSION = "hibi-3.0";
 const SHELL = ["./", "index.html", "config.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
