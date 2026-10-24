@@ -1,5 +1,5 @@
 // Hibi : fonctionne hors ligne. Changer VERSION à chaque mise en ligne.
-const VERSION = "hibi-5.1";
+const VERSION = "hibi-5.2";
 const SHELL = ["./", "index.html", "config.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
