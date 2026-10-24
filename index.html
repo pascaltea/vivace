@@ -202,6 +202,68 @@ input.code{text-transform:uppercase;letter-spacing:.18em;font-variant-numeric:ta
 .tabs2{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;background:var(--tint);padding:.3rem;border-radius:14px}
 .tabs2 button{border:0;background:none;border-radius:10px;min-height:2.9rem;font-weight:700;color:var(--muted)}
 .tabs2 button[aria-pressed="true"]{background:var(--surface);color:var(--ink)}
+/* v2 : un code couleur par capacité (couleur + icône + libellé), anneau de séance, profil cognitif */
+:root{--k-ufov:#D2691E;--k-corsi:#6A4FC0;--k-switch:#17807F;--k-list:#BE3C67;--k-ink:#FFFFFF;--up:#2E7D4F;--down:#B3412E}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--k-ufov:#F0A15B;--k-corsi:#B29CF2;--k-switch:#69CFCB;--k-list:#F08CAE;--k-ink:#0F1715;--up:#71CF98;--down:#EF8C78}}
+:root[data-theme="dark"]{--k-ufov:#F0A15B;--k-corsi:#B29CF2;--k-switch:#69CFCB;--k-list:#F08CAE;--k-ink:#0F1715;--up:#71CF98;--down:#EF8C78}
+.up{color:var(--up)} .down{color:var(--down)}
+.pi{width:2.6rem;height:2.6rem;border-radius:12px;display:inline-grid;place-items:center;color:var(--k-ink);flex:none}
+.pi svg{width:1.35rem;height:1.35rem}
+.pi.lg{width:3.4rem;height:3.4rem;border-radius:16px}
+.pi.lg svg{width:1.75rem;height:1.75rem}
+.gname{display:flex;align-items:center;gap:.9rem}
+.gname.sm h3{margin:0}
+.hero{gap:1.1rem;padding:1.3rem 1.2rem 1.4rem}
+.herotop{display:flex;align-items:center;gap:1rem}
+.ringwrap{flex:none;color:var(--accent-ink)}
+.ringarc{transition:stroke-dasharray .8s ease}
+.plan{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.hero .plan li{display:flex;align-items:center;gap:.8rem;background:color-mix(in srgb, var(--accent-ink) 10%, transparent);border-radius:14px;padding:.55rem .7rem}
+.hero .plan li.ok{opacity:.72}
+.plan .pt{display:flex;flex-direction:column;min-width:0;flex:1;line-height:1.3}
+.plan .pt span{font-size:.85rem;opacity:.85}
+.plan .pdone{font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;opacity:.85}
+.bilan{background:color-mix(in srgb, var(--warm) 12%, var(--surface));border-color:color-mix(in srgb, var(--warm) 35%, var(--line))}
+.profhead{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.profhead>div:first-child{min-width:0}
+.bignum{display:flex;flex-direction:column;align-items:flex-end;flex:none}
+.bignum span{font-family:var(--display);font-weight:800;font-size:2.4rem;line-height:1}
+.bignum small{color:var(--muted);font-weight:700;font-size:.8rem}
+.bars{display:flex;flex-direction:column;gap:.8rem}
+.bar{display:flex;flex-direction:column;gap:.3rem}
+.bl{display:flex;justify-content:space-between;align-items:baseline;gap:.75rem}
+.bl>span.num{white-space:nowrap}
+.bn{display:inline-flex;align-items:center;gap:.5rem;font-weight:700;min-width:0}
+.bn i{width:.7rem;height:.7rem;border-radius:3px;flex:none}
+.bt{position:relative;height:.7rem;border-radius:99px;background:var(--tint);overflow:visible}
+.bt.lg{height:1rem}
+.bt>span{display:block;height:100%;border-radius:99px}
+.bt>span.grow{animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
+.bt em{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;background:var(--ink);border-radius:2px;opacity:.65}
+@keyframes grow{from{width:0}}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.tile2{display:flex;flex-direction:column;align-items:flex-start;gap:.3rem;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1rem;min-height:9.5rem;min-width:0}
+.tile2 .pi{margin-bottom:.35rem}
+.tile2 b{font-size:1.02rem}
+.tile2 .lvl{margin-top:auto;font-size:.8rem;font-weight:700;color:var(--muted)}
+.tile2:active{background:var(--tint)}
+.row .pi{width:2.3rem;height:2.3rem;border-radius:10px}
+.donehead{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.4rem}
+.ringbig{color:var(--accent);margin-bottom:.4rem}
+.confetti{position:fixed;inset:0 0 auto 0;height:0;pointer-events:none;z-index:20}
+.confetti i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:fall 2.2s cubic-bezier(.3,.6,.4,1) forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.2}}
+.ob{padding-top:.5rem}
+.obdots{display:flex;gap:.4rem}
+.obdots i{width:.55rem;height:.55rem;border-radius:50%;background:var(--line)}
+.obdots i.on{background:var(--accent);width:1.4rem;border-radius:99px}
+.obart{display:flex}
+.obart img{border-radius:24px}
+.obl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1rem}
+.obl li{display:flex;gap:.9rem;align-items:flex-start}
+a.btn{text-decoration:none}
+@media (max-width:360px){.tiles{grid-template-columns:1fr}.herotop{flex-direction:column;align-items:flex-start}}
+@media (prefers-reduced-motion: reduce){.confetti{display:none}.bt>span.grow{animation:none}}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
@@ -226,8 +288,8 @@ const $=s=>document.querySelector(s);
 const view=$("#view");
 const KEY="vivace-v1";
 
-function fresh(){return {settings:{size:"grand",pace:"calme"},levels:{ufov:500,corsi:3,list:6,switch:1,swVis:1600},history:[],days:{},family:null,pending:[]}}
-function load(){try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(r&&r.levels&&r.settings){r.history=r.history.filter(h=>h.g!=="switch"||h.v===2);r.levels.switch=r.levels.switch||1;r.family=r.family||null;r.pending=r.pending||[];return r}}catch(e){}return fresh()}
+function fresh(){return {settings:{size:"grand",pace:"calme"},levels:{ufov:500,corsi:3,list:6,switch:1,swVis:1600},history:[],days:{},family:null,pending:[],bilans:[],today:null,name:"",onboarded:false}}
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(r&&r.levels&&r.settings){r.history=r.history.filter(h=>h.g!=="switch"||h.v===2);r.levels.switch=r.levels.switch||1;r.family=r.family||null;r.pending=r.pending||[];r.bilans=r.bilans||[];return r}}catch(e){}return fresh()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
 let D=load();
 document.documentElement.dataset.size=D.settings.size;
@@ -282,45 +344,120 @@ function weekHTML(){const L=["L","M","M","J","V","S","D"];const t=today();
  return '<div class="week" role="list">'+weekDays().map((d,i)=>{const k=dkey(d);const on=!!D.days[k];return `<div class="day${on?" on":""}${k===t?" today":""}" role="listitem" aria-label="${d.toLocaleDateString("fr-FR",{weekday:"long"})}${on?", séance faite":""}"><i>${on?"✓":""}</i><small>${L[i]}</small></div>`}).join("")+"</div>"}
 function weekCount(){return weekDays().filter(d=>D.days[dkey(d)]).length}
 
-function sessionOrder(){const rest=["corsi","switch","list"];const n=Math.floor(Date.now()/864e5)%3;return ["ufov"].concat(rest.slice(n),rest.slice(0,n))}
+/* ---------- profil & plan du jour ---------- */
+const KCOL={ufov:"var(--k-ufov)",corsi:"var(--k-corsi)",switch:"var(--k-switch)",list:"var(--k-list)"};
+const GKEYS=["ufov","corsi","switch","list"];
+function played(g){return D.history.some(h=>h.g===g)}
+function idx(g){const L=D.levels;let v;
+ if(g==="ufov")v=(800-L.ufov)/760*100;
+ else if(g==="corsi")v=(L.corsi-2)/7*100;
+ else if(g==="switch"){const lv=L.switch||1;v=(lv-1)/5*85+(lv>=4?clamp((1600-(L.swVis||1600))/1300,0,1)*15:0)}
+ else v=(L.list-4)/12*100;
+ return Math.round(clamp(v,0,100))}
+const rating=v=>v<25?"Débutant":v<50?"Intermédiaire":v<75?"Avancé":"Expert";
+function overall(){const p=GKEYS.filter(played);return p.length?Math.round(avg(p.map(idx))):null}
+function sessionOrder(){const rest=["corsi","switch","list"];const n=Math.floor(Date.now()/864e5)%3;let r=rest.slice(n).concat(rest.slice(0,n));
+ if(rest.every(played)){const w=rest.reduce((a,b)=>idx(b)<idx(a)?b:a);r=[w].concat(r.filter(x=>x!==w))}
+ return ["ufov"].concat(r)}
+function todayPlan(){if(!D.today||D.today.d!==today()){D.today={d:today(),order:sessionOrder(),done:[]};save()}return D.today}
+const todayDone=()=>todayPlan().done;
+function ring(n,N,size,label){const r=42,c=2*Math.PI*r,f=N?n/N:0;
+ return `<svg class="ring" viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="${n} exercices sur ${N}"><circle cx="50" cy="50" r="${r}" fill="none" stroke="currentColor" stroke-opacity=".22" stroke-width="9"/><circle cx="50" cy="50" r="${r}" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-dasharray="${(c*f).toFixed(1)} ${c.toFixed(1)}" transform="rotate(-90 50 50)" class="ringarc"/><text x="50" y="${label?52:58}" text-anchor="middle" font-size="${label?24:22}" font-weight="800" fill="currentColor" font-family="Bricolage Grotesque, system-ui, sans-serif">${n}/${N}</text>${label?`<text x="50" y="68" text-anchor="middle" font-size="10" fill="currentColor" opacity=".8" font-family="Atkinson Hyperlegible, system-ui, sans-serif">${label}</text>`:""}</svg>`}
+function bilanDue(){const b=D.bilans||[];if(!b.length)return "first";const [y,m,d]=b[b.length-1].d.split("-").map(Number);return (Date.now()-new Date(y,m-1,d))/864e5>=28?"monthly":null}
+function profileHTML(){
+ const o=overall();const pl=GKEYS.filter(played);
+ const best=pl.length>1?pl.reduce((a,b)=>idx(b)>idx(a)?b:a):null,weak=pl.length>1?pl.reduce((a,b)=>idx(b)<idx(a)?b:a):null;
+ return `<section class="card stack" aria-labelledby="h-prof">
+  <div class="profhead"><div><h3 id="h-prof">Profil cognitif</h3><span class="small muted">Indice Vivace sur 100, d'après votre niveau</span></div>${o!==null?`<div class="bignum"><span class="num">${o}</span><small>${rating(o)}</small></div>`:""}</div>
+  <div class="bars">${GKEYS.map(g=>{const p=played(g),v=idx(g);return `<div class="bar"><div class="bl"><span class="bn"><i style="background:${KCOL[g]}"></i>${GAMES[g].skill}</span><span class="num small">${p?`<b>${v}</b> · ${rating(v)}`:'<span class="muted">à évaluer</span>'}</span></div><div class="bt"><span style="width:${p?Math.max(3,v):0}%;background:${KCOL[g]}"></span></div></div>`}).join("")}</div>
+  ${best&&best!==weak?`<p class="small"><b>Point fort :</b> ${GAMES[best].skill.toLowerCase()}. <b>À travailler :</b> ${GAMES[weak].skill.toLowerCase()}, placé juste après Champ visuel dans vos séances.</p>`:`<p class="small muted">Le profil se remplit au fil des exercices.</p>`}
+ </section>`;
+}
+function startBilan(){session={order:GKEYS.slice(),i:0,results:[],bilan:true,before:Object.fromEntries(GKEYS.map(g=>[g,played(g)?idx(g):null]))};intro("ufov")}
 
 /* ---------- home ---------- */
 function home(){
- const order=sessionOrder();const dateStr=new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
- const done=D.days[today()];const wc=weekCount();
+ const P=todayPlan();const done=P.done.filter(g=>P.order.includes(g));const n=done.length,N=P.order.length,all=n>=N;
+ const nextG=P.order.find(g=>!done.includes(g));
+ const dateStr=new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+ const hello=(new Date().getHours()<18?"Bonjour":"Bonsoir")+(D.name?" "+esc(D.name):"");
+ const due=bilanDue();const wc=weekCount();
  show(`<div class="stack-lg">
-  <header class="stack" style="gap:.35rem"><p class="eyebrow">${dateStr}</p><h1>Vivace</h1><p class="muted">Dix minutes par jour pour garder l'esprit rapide. Gratuit, sans compte, sans publicité.</p></header>
+  <header class="stack" style="gap:.3rem"><p class="eyebrow">${dateStr}</p><h1>${hello}</h1></header>
   <section class="hero" aria-labelledby="h-sess">
-   <div class="stack" style="gap:.25rem"><p class="eyebrow">${done?"Séance faite aujourd'hui":"Séance du jour · environ 10 min"}</p><h2 id="h-sess">${done?"Une de plus pour la route ?":"Quatre exercices, dans cet ordre"}</h2></div>
-   <ol>${order.map((g,i)=>`<li><b>${i+1}</b><span><strong>${GAMES[g].name}</strong>${g==="ufov"?'<span class="core">cœur</span>':""}<br><span class="sk">${GAMES[g].skill}</span></span></li>`).join("")}</ol>
-   <button class="btn" id="go">${done?"Refaire une séance":"Commencer la séance"}</button>
+   <div class="herotop"><div class="ringwrap">${ring(n,N,96)}</div><div class="stack" style="gap:.25rem;min-width:0"><p class="eyebrow">Séance du jour · 10 min</p><h2 id="h-sess">${all?"Séance faite. Bravo !":n?"On reprend où vous en étiez":"Prêt pour aujourd'hui ?"}</h2></div></div>
+   <ol class="plan">${P.order.map((g,i)=>{const ok=done.includes(g);return `<li class="${ok?"ok":""}"><span class="pi" style="background:${KCOL[g]}">${ok?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>':ICON[g]}</span><span class="pt"><strong>${GAMES[g].name}</strong><span>${GAMES[g].skill}${i===0?" · cœur de la séance":""}</span></span>${ok?'<span class="pdone">fait</span>':""}</li>`}).join("")}</ol>
+   <button class="btn" id="go">${all?"Refaire une séance":n?"Continuer : "+GAMES[nextG].name:"Commencer la séance"}</button>
+   ${n&&!all?'<p class="small" style="opacity:.85">Faites une pause quand vous voulez : la séance reprend ici.</p>':""}
   </section>
+  ${due?`<section class="card stack bilan" aria-labelledby="h-bil"><p class="eyebrow">${due==="first"?"Pour bien démarrer":"Bilan du mois"}</p><h3 id="h-bil">${due==="first"?"Faites votre bilan de départ":"C'est l'heure de votre bilan mensuel"}</h3><p class="small muted">Les 4 exercices à la suite, environ 12 minutes. Il sert de repère pour mesurer vos progrès d'un mois sur l'autre.</p><button class="btn ghost" id="bil">Commencer le bilan</button></section>`:""}
+  ${profileHTML()}
   <section class="card stack" aria-labelledby="h-week">
    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap"><h3 id="h-week">Cette semaine</h3><span class="muted small num">${wc} jour${wc>1?"s":""} sur 5 visés</span></div>
    ${weekHTML()}
    <p class="small muted">Un jour manqué n'efface rien. Ce qui compte, c'est la régularité sur plusieurs semaines.</p>
   </section>
   <section class="stack" aria-labelledby="h-free"><h3 id="h-free">Exercices à la carte</h3>
-   <div class="card rows" style="padding-block:.3rem">${Object.keys(GAMES).map(g=>`<button class="row" data-g="${g}"><span class="ic">${ICON[g]}</span><span class="t"><b>${GAMES[g].name}</b><span>${GAMES[g].skill} · niveau ${levelText(g)}</span></span><span class="chev" aria-hidden="true">›</span></button>`).join("")}</div>
+   <div class="tiles">${GKEYS.map(g=>`<button class="tile2" data-g="${g}"><span class="pi" style="background:${KCOL[g]}">${ICON[g]}</span><b>${GAMES[g].name}</b><span class="small muted">${GAMES[g].skill}</span><span class="lvl num">${played(g)?rating(idx(g))+" · "+idx(g):"Nouveau"}</span></button>`).join("")}</div>
   </section>
  </div>`,"home");
- $("#go").onclick=()=>{session={order,i:0,results:[]};intro(order[0])};
- view.querySelectorAll(".row[data-g]").forEach(b=>b.onclick=()=>{session=null;intro(b.dataset.g)});
+ $("#go").onclick=()=>{if(all){P.done=[];save()}const start=all?0:P.order.indexOf(nextG);session={order:P.order,i:start,results:[]};intro(P.order[start])};
+ if(due)$("#bil").onclick=startBilan;
+ view.querySelectorAll(".tile2[data-g]").forEach(b=>b.onclick=()=>{session=null;intro(b.dataset.g)});
 }
 function levelText(g){const L=D.levels;if(g==="ufov")return L.ufov+" ms";if(g==="corsi")return L.corsi+" cases";if(g==="list")return L.list+" articles";return "niveau "+(L.switch||1)+" / 6"}
 function lastOf(g){for(let i=D.history.length-1;i>=0;i--)if(D.history[i].g===g)return D.history[i];return null}
 
+/* ---------- accueil : première ouverture ---------- */
+function onboarding(step){
+ step=step||0;const dots=`<div class="obdots" aria-hidden="true">${[0,1,2].map(i=>`<i class="${i===step?"on":""}"></i>`).join("")}</div>`;
+ const skip='<button class="linkbtn" id="obskip">Passer</button>';
+ const finish=()=>{D.onboarded=true;save()};
+ if(step===0){show(`<div class="stack-lg ob">
+  <div class="gtop"><span>${dots}</span>${skip}</div>
+  <div class="obart" aria-hidden="true"><img src="icons/icon-192.png" alt="" width="96" height="96"></div>
+  <div class="stack" style="gap:.5rem"><h1>Bienvenue dans Vivace</h1><p class="muted">Un entraînement court et régulier pour garder l'esprit rapide après 40 ans.</p></div>
+  <ul class="obl">
+   <li><span class="pi" style="background:var(--k-ufov)">${ICON.ufov}</span><span><b>10 minutes par jour</b><br><span class="muted small">4 exercices, une séance que vous pouvez interrompre et reprendre.</span></span></li>
+   <li><span class="pi" style="background:var(--k-switch)">${ICON.switch}</span><span><b>La difficulté s'adapte à vous</b><br><span class="muted small">À chaque essai, ni trop facile, ni décourageant.</span></span></li>
+   <li><span class="pi" style="background:var(--k-list)">${ICON.list}</span><span><b>Gratuit, sans publicité</b><br><span class="muted small">Pas de compte à créer. Vos données restent sur votre téléphone.</span></span></li>
+  </ul>
+  <button class="btn" id="obnext">Continuer</button>
+ </div>`);document.body.classList.add("playing");$("#obnext").onclick=()=>onboarding(1);$("#obskip").onclick=()=>{finish();home()};return}
+ if(step===1){const S=D.settings;const seg=(k,opts)=>`<div class="seg" role="group">${opts.map(o=>`<button data-k="${k}" data-v="${o[0]}" aria-pressed="${S[k]===o[0]}">${o[1]}</button>`).join("")}</div>`;
+  show(`<div class="stack-lg ob">
+  <div class="gtop"><span>${dots}</span>${skip}</div>
+  <div class="stack" style="gap:.5rem"><h1>Faisons connaissance</h1><p class="muted">Tout se modifie plus tard dans Réglages.</p></div>
+  <label class="f" for="ob-name">Votre prénom <span class="muted small" style="font-weight:400">(facultatif)</span><input class="t" id="ob-name" autocomplete="given-name" maxlength="40" value="${esc(D.name||"")}" placeholder="Ex. Pascal"></label>
+  <section class="stack" style="gap:.5rem"><b>Taille du texte</b>${seg("size",[["normal","Normal"],["grand","Grand"],["tresgrand","Très grand"]])}</section>
+  <section class="stack" style="gap:.5rem"><b>Rythme</b>${seg("pace",[["calme","Calme"],["standard","Standard"]])}<p class="small muted">Le rythme calme laisse plus de temps pour regarder et lire.</p></section>
+  <button class="btn" id="obnext">Continuer</button>
+ </div>`);document.body.classList.add("playing");
+  const keep=()=>{D.name=$("#ob-name").value.trim().slice(0,40);save()};
+  view.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{keep();D.settings[b.dataset.k]=b.dataset.v;if(b.dataset.k==="size")document.documentElement.dataset.size=b.dataset.v;save();onboarding(1)});
+  $("#obnext").onclick=()=>{keep();onboarding(2)};$("#obskip").onclick=()=>{keep();finish();home()};return}
+ show(`<div class="stack-lg ob">
+  <div class="gtop"><span>${dots}</span><span></span></div>
+  <div class="stack" style="gap:.5rem"><h1>Commencez par un bilan</h1><p>Les 4 exercices à la suite, environ 12 minutes. Ce point de départ permet de mesurer vos progrès réels, mois après mois.</p></div>
+  ${profileHTML()}
+  <div class="stack" style="gap:.6rem"><button class="btn" id="obbil">Faire mon bilan maintenant</button><button class="btn quiet" id="oblater">Plus tard</button></div>
+ </div>`);document.body.classList.add("playing");
+ $("#obbil").onclick=()=>{finish();startBilan()};$("#oblater").onclick=()=>{finish();home()};
+}
+
 /* ---------- intro ---------- */
+function posLabel(){return session?(session.bilan?"Bilan · ":"")+`Exercice ${session.i+1} sur ${session.order.length}`:"Exercice libre"}
 function intro(g){
- const G=GAMES[g];const pos=session?`Exercice ${session.i+1} sur ${session.order.length}`:"Exercice libre";
+ const G=GAMES[g];
  show(`<div class="stack-lg">
-  <div class="gtop"><button class="linkbtn" id="back">‹ Retour</button><span>${pos}</span></div>
-  <div class="stack" style="gap:.3rem"><p class="eyebrow">${G.skill}</p><h2>${G.name}</h2></div>
-  <div class="illu" aria-hidden="true">${G.illu}</div>
+  <div class="gtop"><button class="linkbtn" id="back">‹ Retour</button><span>${posLabel()}</span></div>
+  <div class="gname"><span class="pi lg" style="background:${KCOL[g]}">${ICON[g]}</span><div><p class="eyebrow">${G.skill}</p><h2>${G.name}</h2></div></div>
+  <div class="illu" style="background:color-mix(in srgb, ${KCOL[g]} 16%, var(--surface))" aria-hidden="true">${G.illu}</div>
   <ol class="steps">${G.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
   <p class="note small muted">${G.why}</p>
   <div class="stack" style="gap:.6rem"><button class="btn" id="start">Commencer</button>${session?'<button class="btn quiet" id="skip">Passer cet exercice</button>':""}</div>
  </div>`);
+ document.body.classList.add("playing");
  $("#back").onclick=()=>{session=null;home()};
  $("#start").onclick=()=>play(g);
  if(session)$("#skip").onclick=()=>next();
@@ -331,7 +468,7 @@ function shell(g){
  runId++;document.body.classList.add("playing");
  view.innerHTML=`<div class="stack">
   <div class="gtop"><button class="linkbtn" id="quit">‹ Quitter</button><span id="trial" class="num"></span></div>
-  <h2>${GAMES[g].name}</h2>
+  <div class="gname"><span class="pi" style="background:${KCOL[g]}">${ICON[g]}</span><h2>${GAMES[g].name}</h2></div>
   <p id="msg"></p>
   <div id="stage"></div>
   <div id="fb" aria-live="polite"></div>
@@ -350,16 +487,18 @@ function ask(opts){ // [{v,label,cls}]
 async function flash(ok,text){const s=$("#stage"),f=$("#fb");if(!s)return;s.classList.add(ok?"ok":"bad");f.className=ok?"ok":"bad";f.textContent=text||(ok?"Juste":"Pas tout à fait");await wait(ok?550:850);if(!$("#stage"))return;s.classList.remove("ok","bad");f.textContent="";f.className=""}
 
 async function play(g){
- const id=shell(g);
+ const id=shell(g);const before=played(g)?idx(g):null;
  const r=await RUN[g](id);
  if(!r||!alive(id))return;
  const prev=lastOf(g);
  D.history.push({d:today(),g,s:r.score,v:2});
  if(D.history.length>600)D.history=D.history.slice(-600);
- D.days[today()]=true;save();
+ D.days[today()]=true;
+ if(session&&!session.bilan){const P=todayPlan();if(!P.done.includes(g))P.done.push(g)}
+ save();
  queue(g,r.score,today());
  if(session)session.results.push({g,score:r.score});
- result(g,r,prev);
+ result(g,r,prev,before);
 }
 
 /* ---------- 1. Champ visuel ---------- */
@@ -530,26 +669,47 @@ function deltaText(g,s,prev){
  if(d===0)return "Comme la dernière fois. Le niveau tient.";
  return "Un peu en dessous de la dernière fois. Les scores varient d'un jour à l'autre, regardez plutôt la courbe sur plusieurs semaines.";
 }
-function result(g,r,prev){
- const G=GAMES[g];const more=session&&session.i<session.order.length-1;
+function nextIdx(){if(!session)return -1;for(let j=session.i+1;j<session.order.length;j++){if(session.bilan||!todayDone().includes(session.order[j]))return j}return -1}
+function result(g,r,prev,before){
+ const G=GAMES[g];const after=idx(g);const j=nextIdx();
+ const diff=before===null?null:after-before;
  show(`<div class="stack-lg">
-  <div class="gtop"><span></span><span>${session?`Exercice ${session.i+1} sur ${session.order.length}`:"Exercice libre"}</span></div>
-  <div class="stack" style="gap:.4rem"><p class="eyebrow">${G.name} · ${G.skill}</p><p><span class="big">${fmt(r.score)}</span><span class="unit">${G.unit}</span></p><p class="small muted">${G.better==="lower"?"Plus bas, c'est mieux.":"Plus haut, c'est mieux."}</p></div>
-  <p class="delta">${deltaText(g,r.score,prev)}</p>
+  <div class="gtop"><span></span><span>${posLabel()}</span></div>
+  <div class="gname"><span class="pi lg" style="background:${KCOL[g]}">${ICON[g]}</span><div><p class="eyebrow">${G.name} · ${G.skill}</p><p><span class="big">${fmt(r.score)}</span><span class="unit">${G.unit}</span></p></div></div>
+  <p class="delta">${deltaText(g,r.score,prev)} <span class="muted small">${G.better==="lower"?"(plus bas, c'est mieux)":""}</span></p>
+  <section class="card stack" style="gap:.55rem">
+   <div class="bl"><b>Indice ${G.skill.toLowerCase()}</b><span class="num"><b>${after}</b> · ${rating(after)}</span></div>
+   <div class="bt lg"><span class="grow" style="width:${Math.max(3,after)}%;background:${KCOL[g]}"></span>${before!==null&&diff!==0?`<em style="left:${before}%" aria-hidden="true"></em>`:""}</div>
+   <p class="small muted">${diff===null?"Premier repère enregistré pour cette capacité.":diff>0?`+${diff} pendant cet exercice. Le trait marque où vous étiez avant.`:diff<0?`${diff} : la difficulté s'est ajustée pour consolider. C'est normal et utile.`:"Niveau stable."}</p>
+  </section>
   <ul class="plain">${r.lines.map(l=>`<li>${l}</li>`).join("")}</ul>
-  <div class="stack" style="gap:.6rem"><button class="btn" id="nx">${more?"Exercice suivant : "+GAMES[session.order[session.i+1]].name:session?"Voir le bilan de la séance":"Terminer"}</button>${session?"":'<button class="btn quiet" id="again">Rejouer</button>'}</div>
+  <div class="stack" style="gap:.6rem"><button class="btn" id="nx">${j>=0?"Exercice suivant : "+GAMES[session.order[j]].name:session?(session.bilan?"Voir mon bilan":"Terminer la séance"):"Terminer"}</button>${session?"":'<button class="btn quiet" id="again">Rejouer</button>'}</div>
  </div>`);
  document.body.classList.add("playing");
  $("#nx").onclick=()=>session?next():home();
  if(!session)$("#again").onclick=()=>play(g);
 }
-function next(){if(!session)return home();session.i++;if(session.i<session.order.length)intro(session.order[session.i]);else done()}
+function next(){if(!session)return home();const j=nextIdx();if(j<0)return done();session.i=j;intro(session.order[j])}
+function confetti(){const cols=["var(--k-ufov)","var(--k-corsi)","var(--k-switch)","var(--k-list)","var(--accent)"];let s="";for(let i=0;i<36;i++)s+=`<i style="left:${Math.random()*100}%;background:${cols[i%5]};animation-delay:${(Math.random()*.6).toFixed(2)}s;transform:rotate(${Math.round(Math.random()*360)}deg)"></i>`;return `<div class="confetti" aria-hidden="true">${s}</div>`}
 function done(){
- const res=session.results;session=null;const wc=weekCount();
+ const S=session;session=null;const res=S.results;const wc=weekCount();
+ let bil="";
+ if(S.bilan){
+  const now={};GKEYS.forEach(g=>{if(played(g))now[g]=idx(g)});
+  const prevB=(D.bilans||[]).slice(-1)[0];
+  D.bilans=(D.bilans||[]).concat([{d:today(),idx:now}]);save();
+  const ov=Object.values(now).length?Math.round(avg(Object.values(now))):null;
+  bil=`<section class="card stack"><div class="profhead"><div><h3>Votre bilan du ${fmtDay(today())}</h3><span class="small muted">${prevB?"Comparé au bilan du "+fmtDay(prevB.d):"Votre point de départ"}</span></div>${ov!==null?`<div class="bignum"><span class="num">${ov}</span><small>${rating(ov)}</small></div>`:""}</div>
+   <div class="bars">${GKEYS.map(g=>{const v=now[g];if(v===undefined)return "";const p=prevB&&prevB.idx[g]!==undefined?prevB.idx[g]:null;const d=p===null?null:v-p;return `<div class="bar"><div class="bl"><span class="bn"><i style="background:${KCOL[g]}"></i>${GAMES[g].skill}</span><span class="num small"><b>${v}</b>${d!==null?` <span class="${d>0?"up":d<0?"down":"muted"}">${d>0?"+":""}${d}</span>`:""}</span></div><div class="bt"><span class="grow" style="width:${Math.max(3,v)}%;background:${KCOL[g]}"></span>${p!==null&&d!==0?`<em style="left:${p}%"></em>`:""}</div></div>`}).join("")}</div>
+   <p class="small muted">Prochain bilan conseillé dans 4 semaines. Vivace vous le proposera sur l'accueil.</p></section>`;
+ }
+ const P=todayPlan();
  show(`<div class="stack-lg">
-  <div class="stack" style="gap:.35rem"><p class="eyebrow">Séance terminée</p><h2>Bien joué. À demain.</h2></div>
+  ${confetti()}
+  <div class="donehead"><div class="ringbig">${ring(S.bilan?res.length:P.done.length,S.bilan?4:P.order.length,132,S.bilan?"bilan":"aujourd'hui")}</div><p class="eyebrow">${S.bilan?"Bilan terminé":"Séance terminée"}</p><h1>${S.bilan?"Merci, c'est noté.":"Bien joué"+(D.name?", "+esc(D.name):"")+"."}</h1><p class="muted">${S.bilan?"Voici votre repère du jour.":wc>=5?"Objectif de la semaine atteint. Tout ce qui vient en plus est du bonus.":`Encore ${5-wc} jour${5-wc>1?"s":""} cette semaine pour atteindre l'objectif.`}</p></div>
+  ${bil}
   <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h3>Cette semaine</h3><span class="muted small num">${wc} / 5 jours</span></div>${weekHTML()}</section>
-  ${res.length?`<section class="card rows" style="padding-block:.3rem">${res.map(x=>`<div class="row"><span class="ic">${ICON[x.g]}</span><span class="t"><b>${GAMES[x.g].name}</b><span>${GAMES[x.g].skill}</span></span><span class="num"><b>${fmt(x.score)}</b> <span class="muted small">${GAMES[x.g].unit}</span></span></div>`).join("")}</section>`:""}
+  ${res.length&&!S.bilan?`<section class="card rows" style="padding-block:.3rem">${res.map(x=>`<div class="row"><span class="pi" style="background:${KCOL[x.g]}">${ICON[x.g]}</span><span class="t"><b>${GAMES[x.g].name}</b><span>${GAMES[x.g].skill}</span></span><span class="num"><b>${fmt(x.score)}</b> <span class="muted small">${GAMES[x.g].unit}</span></span></div>`).join("")}</section>`:""}
   <p class="note small muted">Pour aller plus loin aujourd'hui, le plus utile n'est pas un exercice de plus : une marche rapide de 20 minutes ou un appel à quelqu'un fait autant pour le cerveau.</p>
   <button class="btn" id="h">Retour à l'accueil</button>
  </div>`,"home");
@@ -558,7 +718,7 @@ function done(){
 
 /* ---------- progrès ---------- */
 function chart(g){
- const pts=D.history.filter(h=>h.g===g).slice(-12);const G=GAMES[g];
+ const col=KCOL[g];const pts=D.history.filter(h=>h.g===g).slice(-12);const G=GAMES[g];
  if(pts.length<2)return `<p class="small muted">${pts.length?"Encore une partie et la courbe apparaît.":"Pas encore de partie. La courbe apparaîtra après deux exercices."}</p>`;
  const W=320,H=120,pl=40,pr=12,pt=12,pb=22;const vals=pts.map(p=>p.s);
  let mn=Math.min(...vals),mx=Math.max(...vals);if(mn===mx){mn-=1;mx+=1}
@@ -574,20 +734,32 @@ function chart(g){
   <text x="${pl-6}" y="${pt+4}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(Math.round(best))}</text>
   <text x="${pl-6}" y="${H-pb+4}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(Math.round(worst))}</text>
   <text x="${pl}" y="${H-5}" font-size="11" fill="var(--muted)">${pts.length} dernières parties</text>
-  <path d="${area}" fill="var(--accent)" fill-opacity=".12"/>
-  <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-  ${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.s).toFixed(1)}" r="${i===pts.length-1?4.5:2.5}" fill="${i===pts.length-1?"var(--warm)":"var(--accent)"}"/>`).join("")}
+  <path d="${area}" fill="${col}" fill-opacity=".14"/>
+  <path d="${line}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  ${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.s).toFixed(1)}" r="${i===pts.length-1?5:2.5}" fill="${col}"/>`).join("")}
  </svg></div>`;
 }
 function progress(){
  const n=new Date();const days=[];for(let i=27;i>=0;i--)days.push(new Date(n.getFullYear(),n.getMonth(),n.getDate()-i));
  const active=days.filter(d=>D.days[dkey(d)]).length;
+ const B=D.bilans||[];const first=B[0],last=B[B.length-1];
+ let bh="";
+ if(B.length){
+  const o=x=>{const v=Object.values(x.idx);return v.length?Math.round(avg(v)):null};
+  bh=`<section class="card stack" style="gap:.6rem"><h3>Vos bilans</h3>
+   <div class="rows">${B.slice(-6).reverse().map(b=>`<div class="row" style="min-height:3rem"><span class="t"><b>${fmtDay(b.d)}</b></span><span class="num"><b>${o(b)??"–"}</b> <span class="small muted">${o(b)!==null?rating(o(b)):""}</span></span></div>`).join("")}</div>
+   ${B.length>1?`<p class="small">Depuis votre premier bilan : <b class="${o(last)-o(first)>=0?"up":"down"}">${o(last)-o(first)>=0?"+":""}${o(last)-o(first)}</b> points d'indice global.</p>`:`<p class="small muted">${bilanDue()?"Votre prochain bilan est disponible sur l'accueil.":"Prochain bilan proposé 4 semaines après le premier."}</p>`}
+  </section>`;
+ }
  show(`<div class="stack-lg">
-  <header class="stack" style="gap:.35rem"><p class="eyebrow">Vos courbes</p><h1>Progrès</h1><p class="muted">Sur chaque courbe, plus haut veut dire mieux. Le dernier point est en orange.</p></header>
+  <header class="stack" style="gap:.35rem"><p class="eyebrow">Vos courbes</p><h1>Progrès</h1></header>
+  ${profileHTML()}
+  ${bh}
   <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h3>4 dernières semaines</h3><span class="muted small num">${active} jours actifs sur 28</span></div>
    <div class="cal" aria-label="Calendrier des 28 derniers jours">${days.map(d=>`<i class="${D.days[dkey(d)]?"on":""}" title="${d.toLocaleDateString("fr-FR")}"></i>`).join("")}</div>
    <p class="small muted">Objectif raisonnable : 5 jours par semaine, pendant au moins 8 semaines.</p></section>
-  ${Object.keys(GAMES).map(g=>{const l=lastOf(g);return `<section class="card stack" style="gap:.6rem"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap"><div><h3>${GAMES[g].name}</h3><span class="small muted">${GAMES[g].skill}</span></div>${l?`<span class="num"><b style="font-size:1.25rem">${fmt(l.s)}</b> <span class="small muted">${GAMES[g].unit}</span></span>`:""}</div>${chart(g)}</section>`}).join("")}
+  <p class="small muted">Sur chaque courbe, plus haut veut dire mieux. Le dernier point est plus gros.</p>
+  ${GKEYS.map(g=>{const l=lastOf(g);return `<section class="card stack" style="gap:.6rem"><div class="gname sm"><span class="pi" style="background:${KCOL[g]}">${ICON[g]}</span><div style="flex:1;min-width:0"><h3>${GAMES[g].name}</h3><span class="small muted">${GAMES[g].skill}</span></div>${l?`<span class="num"><b style="font-size:1.25rem">${fmt(l.s)}</b> <span class="small muted">${GAMES[g].unit}</span></span>`:""}</div>${chart(g)}</section>`}).join("")}
  </div>`,"progress");
 }
 
@@ -639,26 +811,45 @@ function science(){
 }
 
 /* ---------- réglages ---------- */
+function icsReminder(time){
+ const [hh,mm]=time.split(":").map(Number);const d=new Date();d.setDate(d.getDate()+(d.getHours()*60+d.getMinutes()>=hh*60+mm?1:0));
+ const z=n=>String(n).padStart(2,"0");
+ const start=`${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}T${z(hh)}${z(mm)}00`;
+ const now=new Date();const stamp=`${now.getUTCFullYear()}${z(now.getUTCMonth()+1)}${z(now.getUTCDate())}T${z(now.getUTCHours())}${z(now.getUTCMinutes())}${z(now.getUTCSeconds())}Z`;
+ const url=location.origin+location.pathname;
+ return ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Vivace//FR","CALSCALE:GREGORIAN","BEGIN:VEVENT",`UID:vivace-${Date.now()}@vivace`,`DTSTAMP:${stamp}`,`DTSTART:${start}`,"DURATION:PT10M","RRULE:FREQ=DAILY","SUMMARY:Vivace : séance du jour",`DESCRIPTION:10 minutes pour garder l'esprit vif. ${url}`,`URL:${url}`,"BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:Vivace : séance du jour","TRIGGER:PT0M","END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
+}
 function settings(){
  const S=D.settings;
  const seg=(k,opts)=>`<div class="seg" role="group">${opts.map(o=>`<button data-k="${k}" data-v="${o[0]}" aria-pressed="${S[k]===o[0]}">${o[1]}</button>`).join("")}</div>`;
  show(`<div class="stack-lg">
   <header class="stack" style="gap:.35rem"><p class="eyebrow">Confort</p><h1>Réglages</h1></header>
+  <label class="f" for="set-name">Votre prénom<input class="t" id="set-name" autocomplete="given-name" maxlength="40" value="${esc(D.name||"")}" placeholder="Pour vous saluer sur l'accueil"></label>
   <section class="stack" style="gap:.6rem"><h3>Taille du texte</h3>${seg("size",[["normal","Normal"],["grand","Grand"],["tresgrand","Très grand"]])}</section>
   <section class="stack" style="gap:.6rem"><h3>Rythme</h3>${seg("pace",[["calme","Calme"],["standard","Standard"]])}<p class="small muted">Le rythme calme laisse plus de temps pour regarder les séquences et lire la liste. Le temps de Champ visuel s'adapte de toute façon à vous.</p></section>
-  <section class="card stack" style="gap:.6rem"><h3>Niveaux actuels</h3><ul class="plain num">${Object.keys(GAMES).map(g=>`<li>${GAMES[g].name} : ${levelText(g)}</li>`).join("")}</ul></section>
+  <section class="card stack" style="gap:.7rem"><h3>Rappel quotidien</h3><p class="small muted">Ajoute une séance de 10 minutes à votre agenda, tous les jours à l'heure choisie, avec une alerte. Vous pourrez la déplacer ou la supprimer depuis l'agenda.</p>
+   <label class="f" for="rem-time">Heure du rappel<input class="t" type="time" id="rem-time" value="${esc(D.remTime||"09:00")}"></label>
+   <a class="btn" id="rem" href="#" download="vivace-rappel.ics">Ajouter à mon agenda</a></section>
+  <section class="card stack" style="gap:.6rem"><h3>Bilan</h3><p class="small muted">${(D.bilans||[]).length?`Dernier bilan : ${fmtDay(D.bilans[D.bilans.length-1].d)}.`:"Pas encore de bilan."} Un bilan par mois suffit.</p><button class="btn ghost" id="sbil">Faire un bilan maintenant</button></section>
+  <section class="card stack" style="gap:.6rem"><h3>Niveaux actuels</h3><ul class="plain num">${GKEYS.map(g=>`<li>${GAMES[g].name} : ${levelText(g)}</li>`).join("")}</ul></section>
   <section class="stack" style="gap:.6rem"><h3>Vos données</h3><p class="small muted">${D.family?`Vos résultats sont enregistrés sur cet appareil et partagés avec le groupe « ${esc(D.family.name)} ». Seules les personnes qui ont le code du groupe les voient.`:"Tout reste sur cet appareil. Rien n'est envoyé tant que vous ne rejoignez pas un groupe famille."}</p><div id="rz"><button class="btn ghost" id="reset">Effacer mes résultats sur cet appareil</button></div>${D.family?'<div id="lz"><button class="btn ghost" id="leave">Quitter le groupe et effacer mes résultats partagés</button></div>':""}</section>
+  <button class="linkbtn" id="reob" style="align-self:flex-start">Revoir la présentation de Vivace</button>
   <p class="small muted">Vivace · version ${VERSION}</p>
  </div>`,"settings");
+ $("#set-name").onchange=e=>{D.name=e.target.value.trim().slice(0,40);save()};
+ const setIcs=()=>{const t=$("#rem-time").value||"09:00";D.remTime=t;save();$("#rem").href="data:text/calendar;charset=utf-8,"+encodeURIComponent(icsReminder(t))};
+ setIcs();$("#rem-time").onchange=setIcs;
+ $("#sbil").onclick=startBilan;
+ $("#reob").onclick=()=>onboarding(0);
  if(D.family)$("#leave").onclick=()=>{$("#lz").innerHTML=`<div class="confirm"><p>Quitter « ${esc(D.family.name)} » ? Vos résultats seront retirés du groupe. Ils restent sur cet appareil.</p><button class="btn danger" id="lyes">Oui, quitter le groupe</button><button class="btn quiet" id="lno">Annuler</button><p class="err" id="lerr" hidden></p></div>`;
   $("#lyes").onclick=async()=>{try{await rpc("vivace_leave",{p_code:D.family.code,p_member:D.family.memberId});D.family=null;D.pending=[];save();settings()}catch(e){const x=$("#lerr");x.hidden=false;x.textContent=errText(e)}};$("#lno").onclick=settings};
  view.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{D.settings[b.dataset.k]=b.dataset.v;if(b.dataset.k==="size")document.documentElement.dataset.size=b.dataset.v;save();settings()});
- $("#reset").onclick=()=>{$("#rz").innerHTML=`<div class="confirm"><p>Effacer tout l'historique et revenir aux niveaux de départ ?</p><button class="btn danger" id="yes">Oui, tout effacer</button><button class="btn quiet" id="no">Annuler</button></div>`;
-  $("#yes").onclick=()=>{const s=D.settings,f=D.family;D=fresh();D.settings=s;D.family=f;save();settings()};$("#no").onclick=settings};
+ $("#reset").onclick=()=>{$("#rz").innerHTML=`<div class="confirm"><p>Effacer tout l'historique, les bilans et revenir aux niveaux de départ ?</p><button class="btn danger" id="yes">Oui, tout effacer</button><button class="btn quiet" id="no">Annuler</button></div>`;
+  $("#yes").onclick=()=>{const s=D.settings,f=D.family,nm=D.name;D=fresh();D.settings=s;D.family=f;D.name=nm;D.onboarded=true;save();settings()};$("#no").onclick=settings};
 }
 
 /* ---------- famille : synchronisation ---------- */
-const VERSION="1.1";
+const VERSION="2.0";
 const CFG=window.VIVACE_CONFIG||{};
 const shareOn=()=>!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -705,7 +896,7 @@ function joinView(){
   <header class="stack" style="gap:.35rem"><p class="eyebrow">Entre proches</p><h1>Famille</h1><p class="muted">Créez un groupe, invitez vos proches avec un code, et suivez ensemble la régularité et les progrès de chacun.</p></header>
   <div class="tabs2" role="group"><button id="t-create" aria-pressed="${!j}">Créer un groupe</button><button id="t-join" aria-pressed="${j}">J'ai un code</button></div>
   <form class="card stack" id="ff" novalidate>
-   <label class="f" for="f-name">Votre prénom<input class="t" id="f-name" autocomplete="given-name" maxlength="40" placeholder="Ex. Pascal" value="${esc(D.lastName||"")}"></label>
+   <label class="f" for="f-name">Votre prénom<input class="t" id="f-name" autocomplete="given-name" maxlength="40" placeholder="Ex. Pascal" value="${esc(D.lastName||D.name||"")}"></label>
    ${j?`<label class="f" for="f-code">Code du groupe<input class="t code" id="f-code" maxlength="8" autocomplete="off" autocapitalize="characters" placeholder="8 caractères" value="${esc(inv)}"></label>`
       :`<label class="f" for="f-group">Nom du groupe<input class="t" id="f-group" maxlength="40" placeholder="Ex. Famille Tea"></label>`}
    <p class="err" id="ferr" hidden></p>
@@ -794,7 +985,7 @@ function multiChart(g,mem){
 /* ---------- démarrage ---------- */
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
 flush();
-if(new URLSearchParams(location.search).get("famille")&&!D.family)famille();else home();
+if(new URLSearchParams(location.search).get("famille")&&!D.family){D.onboarded=true;save();famille()}else if(!D.onboarded)onboarding(0);else home();
 })();
 </script>
 </body>
