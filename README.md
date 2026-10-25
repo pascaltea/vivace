@@ -49,3 +49,7 @@ Publié avec GitHub Pages depuis la branche `main`, dossier racine (Settings →
 Design « épure » : un seul objet par écran (un disque d'aluminium qui se remplit au fil de la séance), monochrome, une seule couleur d'accent, mode sombre soigné.
 
 Hibi n'est pas un dispositif médical.
+
+## Voix
+
+Les consignes sont des enregistrements (dossier `audio/`), générés avec la voix française Kokoro « Siwis », débit posé, intonation retravaillée (montée légère entre les phrases, descente nette en fin de consigne). Si une phrase est modifiée dans le code sans être régénérée, l'app revient à la voix du téléphone pour cette phrase.

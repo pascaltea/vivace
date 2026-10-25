@@ -490,7 +490,7 @@ function intro(g){
  </div>`);
  document.body.classList.add("playing");
  const sayIt=()=>speak(G.name+". "+G.steps.join(" "));
- if(canSpeak){$("#say").onclick=sayIt;if(voiceOn())setTimeout(sayIt,250)}
+ if(canSpeak){$("#say").onclick=sayIt;if(voiceOn()){preloadVoice(g);setTimeout(sayIt,250)}}
  if((D.practiced||{})[g])$("#prac").onclick=()=>play(g,true);
  $("#back").onclick=()=>{session=null;home()};
  $("#start").onclick=()=>play(g);
@@ -513,9 +513,43 @@ function shell(g){
  return runId;
 }
 let PR=false,spoken=new Set();
-const canSpeak=("speechSynthesis" in window);
-function speak(t){if(!canSpeak||!t)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="fr-FR";u.rate=.95;const v=speechSynthesis.getVoices().find(x=>/^fr/i.test(x.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
-function hush(){if(canSpeak)try{speechSynthesis.cancel()}catch(e){}}
+/* Voix : consignes enregistrées (voix neuronale douce, fichiers audio/), lues par Web Audio.
+   Repli sur la synthèse du téléphone pour toute phrase non enregistrée. */
+const VOICE={"Champ visuel. Fixez la croix au centre. Une forme apparaît au centre, et une étoile sur le pourtour, très brièvement. Dites quelle forme était au centre, puis touchez l'endroit où était l'étoile.":"intro-ufov","Séquence. Des cases s'allument l'une après l'autre. Quand c'est à vous, touchez-les dans le même ordre. Chaque réussite ajoute une case. Deux erreurs de suite terminent l'exercice.":"intro-corsi","Aiguillage. Un chiffre s'affiche avec une règle : « pair ou impair ? » ou « plus ou moins que 5 ? ». La règle change sans prévenir. Six niveaux : une lettre et une troisième règle s'ajoutent, puis la règle n'est plus donnée que par la couleur de la carte, et la carte s'efface de plus en plus vite. Tous les 8 essais, vous montez si vous êtes presque sans faute, et redescendez en cas de difficulté.":"intro-switch","Liste de courses. Une liste de courses défile, un article à la fois. Ensuite, des articles s'affichent : étaient-ils sur la liste ? La liste s'allonge quand vous réussissez bien.":"intro-list","Au centre, c'était :":"m01","Essai à blanc terminé.":"m02","Fixez le centre.":"m03","La liste est finie. Prenez une respiration.":"m04","Mémorisez la liste.":"m05","Regardez bien l'ordre…":"m06","Touchez l'endroit où était l'étoile.":"m07","À vous : touchez les cases dans le même ordre.":"m08","Était-il sur la liste ?":"m09","Voici votre niveau de départ.":"m10","Bravo, on monte d'un cran.":"m11","On redescend d'un cran pour consolider.":"m12"};
+const canTTS=("speechSynthesis" in window);
+const canSpeak=canTTS||!!(window.AudioContext||window.webkitAudioContext);
+let AC=null,voiceSrc=null,voiceTok=0;const voiceBuf={};
+function audioCtx(){
+ if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C()}
+ if(AC.state==="suspended")AC.resume().catch(()=>{});
+ return AC;
+}
+// iPhone : le son ne se débloque que sur un geste ; on profite de chaque toucher quand la voix est utilisée
+document.addEventListener("pointerdown",()=>{if(AC||voiceOn())audioCtx()},{capture:true,passive:true});
+function loadVoice(id){
+ return voiceBuf[id]||(voiceBuf[id]=fetch("audio/"+id+".mp3").then(r=>{if(!r.ok)throw new Error(r.status);return r.arrayBuffer()})
+  .then(b=>new Promise((res,rej)=>audioCtx().decodeAudioData(b,res,rej))).catch(e=>{delete voiceBuf[id];throw e}));
+}
+function preloadVoice(g){if(!audioCtx())return;Object.values(VOICE).forEach(id=>{if(id[0]==="m"||id==="intro-"+g)loadVoice(id).catch(()=>{})})}
+function pickTTSVoice(){
+ const score=v=>{const n=v.name.toLowerCase();let s=/fr-fr/i.test(v.lang)?1:0;
+  if(/premium|enhanced|amélior|natural|neural|online/.test(n))s+=10;
+  if(/audrey|amélie|amelie|marie|denise|vivienne|eloise|léa|julie|céline|google/.test(n))s+=5;
+  if(/thomas|nicolas|henri|daniel|jacques|paul|rémy|remy|grand|eddy|reed|rocko|shelley|sandy|flo\b/.test(n))s-=8;return s};
+ return speechSynthesis.getVoices().filter(v=>/^fr/i.test(v.lang)).sort((a,b)=>score(b)-score(a))[0];
+}
+function tts(t){if(!canTTS)return;try{const u=new SpeechSynthesisUtterance(t);u.lang="fr-FR";u.rate=.92;const v=pickTTSVoice();if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+function speak(t){
+ if(!t)return;hush();const tok=voiceTok,id=VOICE[t];
+ if(id&&audioCtx()){
+  try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){} // lit même si l'iPhone est en silencieux
+  loadVoice(id).then(buf=>{if(tok!==voiceTok)return;const s=AC.createBufferSource();s.buffer=buf;s.connect(AC.destination);s.start();voiceSrc=s})
+   .catch(()=>{if(tok===voiceTok)tts(t)});
+  return;
+ }
+ tts(t);
+}
+function hush(){voiceTok++;if(voiceSrc){try{voiceSrc.stop()}catch(e){}voiceSrc=null}if(canTTS)try{speechSynthesis.cancel()}catch(e){}}
 const voiceOn=()=>D.settings.voice==="on";
 const msg=t=>{$("#msg").textContent=t;if(voiceOn()&&t&&!spoken.has(t)){spoken.add(t);speak(t)}};
 const trial=t=>{$("#trial").textContent=(PR?"Essai à blanc · ":"")+t};
@@ -908,7 +942,7 @@ function settings(){
 }
 
 /* ---------- famille : synchronisation ---------- */
-const VERSION="5.2";
+const VERSION="5.3";
 const CFG=window.VIVACE_CONFIG||{};
 const shareOn=()=>!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
