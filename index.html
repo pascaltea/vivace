@@ -146,7 +146,6 @@ input.code{text-transform:uppercase;letter-spacing:.18em;font-variant-numeric:ta
 .disc{position:relative;border-radius:50%;max-width:100%;background:conic-gradient(from 200deg,var(--m1),var(--m2) 18%,var(--m3) 40%,var(--m4) 62%,var(--m5) 82%,var(--m1));box-shadow:0 34px 60px rgba(20,20,20,.10),0 2px 4px rgba(20,20,20,.06),inset 0 1px 1px rgba(255,255,255,.7)}
 .disc-in{position:absolute;inset:7.5%;border-radius:50%;background:var(--bg);box-shadow:inset 0 2px 7px rgba(0,0,0,.10),inset 0 -1px 1px rgba(255,255,255,.5)}
 .disc svg{position:absolute;inset:0;width:100%;height:100%}
-.ringarc{transition:stroke-dasharray 1s cubic-bezier(.2,.8,.2,1)}
 .plan{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
 .plan li{display:flex;align-items:center;gap:.8rem;border-top:1px solid var(--line);padding:.95rem 0}
 .plan li:last-child{border-bottom:1px solid var(--line)}
@@ -209,7 +208,6 @@ input.code{text-transform:uppercase;letter-spacing:.18em;font-variant-numeric:ta
 .bt{position:relative;height:.3rem;border-radius:99px;background:var(--line)}
 .bt.lg{height:.45rem}
 .bt>span{display:block;height:100%;border-radius:99px}
-.bt>span.grow{animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
 .bt em{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1.5px;background:var(--ink);border-radius:2px;opacity:.65}
 @keyframes grow{from{width:0}}
 .chart svg{width:100%;height:auto;display:block}
@@ -300,7 +298,53 @@ body.playing nav.tabs{display:none}
 .lg{display:inline-grid;place-items:center;width:1.5rem;height:1.5rem;border-radius:6px;font-size:.8rem}
 
 @media (max-width:360px){.tiles{grid-template-columns:1fr}}
-@media (prefers-reduced-motion: reduce){.bt>span.grow{animation:none}*{transition:none!important}}
+/* mouvement : doux, court, jamais pendant un stimulus. Désactivé si l'appareil demande moins d'animations. */
+:root{--ease:cubic-bezier(.2,.8,.2,1);--spring:cubic-bezier(.34,1.45,.64,1)}
+@media (prefers-reduced-motion: no-preference){
+ body{transition:background-color .4s var(--ease),color .4s var(--ease)}
+ /* entrée d'écran : chaque bloc monte et apparaît, en cascade */
+ #view.enter>*>*{animation:rise .6s var(--ease) both;animation-delay:calc(var(--i,0)*55ms)}
+ #view.enter .plan li{animation:rise .55s var(--ease) both}
+ #view.enter .plan li:nth-child(1){animation-delay:.28s} #view.enter .plan li:nth-child(2){animation-delay:.34s}
+ #view.enter .plan li:nth-child(3){animation-delay:.40s} #view.enter .plan li:nth-child(4){animation-delay:.46s}
+ @keyframes rise{from{opacity:0;transform:translateY(12px)}}
+ /* le disque se pose, l'arc se trace, le point orange suit la pointe */
+ #view.enter .disc{animation:settle .9s var(--ease) both}
+ @keyframes settle{from{opacity:0;transform:scale(.94)}}
+ .ringarc{animation:arc 1.3s var(--ease) .2s both}
+ @keyframes arc{from{stroke-dasharray:0 4000}}
+ .ringdot{transform-box:view-box;animation:orbit 1.3s var(--ease) .2s both}
+ @keyframes orbit{from{transform:rotate(var(--from))}}
+ /* barres et courbes */
+ .bt>span{animation:grow 1s var(--ease) .25s both}
+ .bar:nth-child(2) .bt>span{animation-delay:.32s} .bar:nth-child(3) .bt>span{animation-delay:.39s} .bar:nth-child(4) .bt>span{animation-delay:.46s}
+ .chart .ln,.ln{stroke-dasharray:1;animation:draw 1.2s var(--ease) .2s both}
+ @keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+ .chart .ar{animation:fade .8s var(--ease) .7s both}
+ .chart circle{transform-box:fill-box;transform-origin:center;animation:dot .4s var(--spring) both;animation-delay:calc(.25s + var(--k,0)*70ms)}
+ @keyframes fade{from{opacity:0}}
+ @keyframes dot{from{opacity:0;transform:scale(0)}}
+ /* semaine : les points se remplissent un à un, aujourd'hui respire une fois */
+ #view.enter .day.on i{animation:dot .45s var(--spring) both;animation-delay:calc(.2s + var(--d,0)*50ms)}
+ #view.enter .day.today i{animation:breathe 2.4s var(--ease) .6s both}
+ @keyframes breathe{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent2) 0%,transparent)}45%{box-shadow:0 0 0 9px color-mix(in srgb,var(--accent2) 18%,transparent)}100%{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent2) 28%,transparent)}}
+ /* toucher : légère pression, retour avec un ressort */
+ .btn,.tile2,.row,.choice,.seg button,.tabs2 button,.linkbtn{transition:transform .45s var(--spring),background-color .25s var(--ease),color .25s var(--ease),box-shadow .25s var(--ease)}
+ .btn:active,.tile2:active,.row:active{transform:scale(.97);transition-duration:.1s}
+ .seg button:active,.tabs2 button:active,.linkbtn:active{transform:scale(.95);transition-duration:.1s}
+ .choice:active{transition-duration:.1s}
+ nav.tabs button{transition:color .3s var(--ease)}
+ nav.tabs svg{transition:transform .45s var(--spring)}
+ nav.tabs button:active svg{transform:scale(.88);transition-duration:.1s}
+ nav.tabs button[aria-current="page"] svg{animation:pop .5s var(--spring)}
+ @keyframes pop{40%{transform:scale(1.16)}}
+ /* exercices : seul le retour « Juste » s'anime, après la réponse */
+ #fb.ok,#fb.bad{animation:fb .35s var(--spring)}
+ @keyframes fb{from{opacity:0;transform:translateY(4px) scale(.96)}}
+ #stage{transition:box-shadow .3s var(--ease)}
+ details>*:not(summary){animation:rise .4s var(--ease)}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
@@ -366,7 +410,25 @@ let runId=0, session=null;
 const alive=id=>id===runId;
 function setTab(t){document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===t?"page":"false"))}
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{({home,progress,famille,science,settings})[b.dataset.tab]()}));
-function show(html,tab){runId++;hush();document.body.classList.remove("playing");if(tab)setTab(tab);view.innerHTML=html;window.scrollTo(0,0)}
+const MOTION=()=>!matchMedia("(prefers-reduced-motion: reduce)").matches;
+function show(html,tab){runId++;hush();document.body.classList.remove("playing");if(tab)setTab(tab);
+ view.classList.remove("enter");view.innerHTML=html;window.scrollTo(0,0);
+ if(MOTION()){const r=view.firstElementChild;if(r)[...r.children].forEach((c,i)=>c.style.setProperty("--i",Math.min(i,8)));
+  view.querySelectorAll(".day.on").forEach((d,i)=>d.style.setProperty("--d",i));
+  void view.offsetWidth;view.classList.add("enter")}
+ countUp(view);
+}
+// chiffres qui défilent jusqu'à leur valeur (format identique à l'affichage final)
+function countUp(root){
+ if(!MOTION())return;
+ root.querySelectorAll("[data-count]").forEach(el=>{
+  const to=+el.dataset.count,f=el.dataset.fmt?fmt:(v=>String(Math.round(v)));if(!isFinite(to)||to===0)return;
+  const dec=(String(to).split(".")[1]||"").length,t0=performance.now(),dur=1100,delay=200;
+  const tick=now=>{const x=Math.min(1,Math.max(0,(now-t0-delay)/dur)),e=1-Math.pow(1-x,3),v=to*e;
+   el.textContent=f(dec?+v.toFixed(dec):Math.round(v));if(x<1&&el.isConnected)requestAnimationFrame(tick);else el.textContent=f(to)};
+  el.textContent=f(0);requestAnimationFrame(tick);
+ });
+}
 
 /* ---------- week ---------- */
 function weekDays(){const n=new Date();const off=(n.getDay()+6)%7;const m=new Date(n.getFullYear(),n.getMonth(),n.getDate()-off);return Array.from({length:7},(_,i)=>new Date(m.getFullYear(),m.getMonth(),m.getDate()+i))}
@@ -392,13 +454,13 @@ function sessionOrder(){const rest=["corsi","switch","list"];const n=Math.floor(
 function todayPlan(){if(!D.today||D.today.d!==today()){D.today={d:today(),order:sessionOrder(),done:[]};save()}return D.today}
 const todayDone=()=>todayPlan().done;
 function ring(n,N,size,label){const f=N?n/N:0,s=size,c=s/2,R=s*0.36,C=2*Math.PI*R,a=(-90+360*f)*Math.PI/180,w=Math.max(2,s/110);
- return `<div class="disc" style="width:${s}px;height:${s}px"><div class="disc-in"></div><svg viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" role="img" aria-label="${n} exercices sur ${N}"><circle cx="${c}" cy="${c}" r="${R}" fill="none" stroke="var(--line)" stroke-width="${w}"/>${f>0?`<circle class="ringarc" cx="${c}" cy="${c}" r="${R}" fill="none" stroke="var(--ink)" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 ${c} ${c})"/><circle cx="${(c+R*Math.cos(a)).toFixed(1)}" cy="${(c+R*Math.sin(a)).toFixed(1)}" r="${(s/56).toFixed(1)}" fill="var(--accent2)"/>`:""}<text x="${c}" y="${(c+s*0.065).toFixed(1)}" text-anchor="middle" font-size="${(s*0.2).toFixed(1)}" font-weight="200" fill="var(--ink)" letter-spacing="-2" font-family="Hanken Grotesk, system-ui, sans-serif">${n}<tspan fill="var(--muted)"> / ${N}</tspan></text>${label?`<text x="${c}" y="${(c+s*0.16).toFixed(1)}" text-anchor="middle" font-size="${(s*0.05).toFixed(1)}" fill="var(--muted)" font-family="Hanken Grotesk, system-ui, sans-serif">${label}</text>`:""}</svg></div>`}
+ return `<div class="disc" style="width:${s}px;height:${s}px"><div class="disc-in"></div><svg viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" role="img" aria-label="${n} exercices sur ${N}"><circle cx="${c}" cy="${c}" r="${R}" fill="none" stroke="var(--line)" stroke-width="${w}"/>${f>0?`<circle class="ringarc" cx="${c}" cy="${c}" r="${R}" fill="none" stroke="var(--ink)" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 ${c} ${c})"/><circle class="ringdot" style="transform-origin:${c}px ${c}px;--from:${(-360*f).toFixed(1)}deg" cx="${(c+R*Math.cos(a)).toFixed(1)}" cy="${(c+R*Math.sin(a)).toFixed(1)}" r="${(s/56).toFixed(1)}" fill="var(--accent2)"/>`:""}<text x="${c}" y="${(c+s*0.065).toFixed(1)}" text-anchor="middle" font-size="${(s*0.2).toFixed(1)}" font-weight="200" fill="var(--ink)" letter-spacing="-2" font-family="Hanken Grotesk, system-ui, sans-serif"><tspan data-count="${n}">${n}</tspan><tspan fill="var(--muted)"> / ${N}</tspan></text>${label?`<text x="${c}" y="${(c+s*0.16).toFixed(1)}" text-anchor="middle" font-size="${(s*0.05).toFixed(1)}" fill="var(--muted)" font-family="Hanken Grotesk, system-ui, sans-serif">${label}</text>`:""}</svg></div>`}
 function bilanDue(){const b=D.bilans||[];if(!b.length)return "first";const [y,m,d]=b[b.length-1].d.split("-").map(Number);return (Date.now()-new Date(y,m-1,d))/864e5>=28?"monthly":null}
 function profileHTML(){
  const o=overall();const pl=GKEYS.filter(played);
  const best=pl.length>1?pl.reduce((a,b)=>idx(b)>idx(a)?b:a):null,weak=pl.length>1?pl.reduce((a,b)=>idx(b)<idx(a)?b:a):null;
  return `<section class="card stack" aria-labelledby="h-prof">
-  <div class="profhead"><div><h2 class="h3" id="h-prof">Profil cognitif</h2><span class="small muted">Indice Hibi sur 100, d'après votre niveau</span></div>${o!==null?`<div class="bignum"><span class="num">${o}</span><small>${rating(o)}</small></div>`:""}</div>
+  <div class="profhead"><div><h2 class="h3" id="h-prof">Profil cognitif</h2><span class="small muted">Indice Hibi sur 100, d'après votre niveau</span></div>${o!==null?`<div class="bignum"><span class="num" data-count="${o}">${o}</span><small>${rating(o)}</small></div>`:""}</div>
   <div class="bars">${GKEYS.map(g=>{const p=played(g),v=idx(g);return `<div class="bar"><div class="bl"><span class="bn"><i style="background:${KCOL[g]}"></i>${GAMES[g].skill}</span><span class="num small">${p?`<b>${v}</b> · ${rating(v)}`:'<span class="muted">à évaluer</span>'}</span></div><div class="bt"><span style="width:${p?Math.max(3,v):0}%;background:${KCOL[g]}"></span></div></div>`}).join("")}</div>
   ${best&&best!==weak?`<p class="small"><b>Point fort :</b> ${GAMES[best].skill.toLowerCase()}. <b>À travailler :</b> ${GAMES[weak].skill.toLowerCase()}, placé juste après Champ visuel dans vos séances.</p>`:`<p class="small muted">Le profil se remplit au fil des exercices.</p>`}
  </section>`;
@@ -557,7 +619,7 @@ function ask(opts){ // [{v,label,cls}]
  const c=$("#controls");c.innerHTML="";
  return new Promise(res=>{opts.forEach(o=>{const b=document.createElement("button");b.className="choice"+(o.cls?" "+o.cls:"");b.innerHTML=o.label;b.onclick=()=>{c.innerHTML="";res(o.v)};c.appendChild(b)})});
 }
-async function flash(ok,text){const s=$("#stage"),f=$("#fb");if(!s)return;s.classList.add(ok?"ok":"bad");f.className=ok?"ok":"bad";f.textContent=text||(ok?"Juste":"Pas tout à fait");await wait(ok?550:850);if(!$("#stage"))return;s.classList.remove("ok","bad");f.textContent="";f.className=""}
+async function flash(ok,text){const s=$("#stage"),f=$("#fb");if(!s)return;s.classList.add(ok?"ok":"bad");f.className="";void f.offsetWidth;f.className=ok?"ok":"bad";f.textContent=text||(ok?"Juste":"Pas tout à fait");await wait(ok?550:850);if(!$("#stage"))return;s.classList.remove("ok","bad");f.textContent="";f.className=""}
 
 async function play(g,forcePractice){
  if(forcePractice||!(D.practiced||{})[g]){
@@ -762,11 +824,11 @@ function result(g,r,prev,before){
  const diff=before===null?null:after-before;
  show(`<div class="stack-lg">
   <div class="gtop"><span></span><span>${posLabel()}</span></div>
-  <div class="gname"><span class="pi lg" style="background:${KCOL[g]}"></span><div><p class="eyebrow">${G.name} · ${G.skill}</p><p><span class="big">${fmt(r.score)}</span><span class="unit">${G.unit}</span></p></div></div>
+  <div class="gname"><span class="pi lg" style="background:${KCOL[g]}"></span><div><p class="eyebrow">${G.name} · ${G.skill}</p><p><span class="big" data-count="${r.score}" data-fmt="1">${fmt(r.score)}</span><span class="unit">${G.unit}</span></p></div></div>
   <p class="delta">${deltaText(g,r.score,prev)} <span class="muted small">${G.better==="lower"?"(plus bas, c'est mieux)":""}</span></p>
   <section class="card stack" style="gap:.55rem">
    <div class="bl"><b>Indice ${G.skill.toLowerCase()}</b><span class="num"><b>${after}</b> · ${rating(after)}</span></div>
-   <div class="bt lg"><span class="grow" style="width:${Math.max(3,after)}%;background:${KCOL[g]}"></span>${before!==null&&diff!==0?`<em style="left:${before}%" aria-hidden="true"></em>`:""}</div>
+   <div class="bt lg"><span style="width:${Math.max(3,after)}%;background:${KCOL[g]}"></span>${before!==null&&diff!==0?`<em style="left:${before}%" aria-hidden="true"></em>`:""}</div>
    <p class="small muted">${diff===null?"Premier repère enregistré pour cette capacité.":diff>0?`+${diff} pendant cet exercice. Le trait marque où vous étiez avant.`:diff<0?`${diff} : la difficulté s'est ajustée pour consolider. C'est normal et utile.`:"Niveau stable."}</p>
   </section>
   <ul class="plain">${r.lines.map(l=>`<li>${l}</li>`).join("")}</ul>
@@ -786,7 +848,7 @@ function done(){
   D.bilans=(D.bilans||[]).concat([{d:today(),idx:now}]);save();
   const ov=Object.values(now).length?Math.round(avg(Object.values(now))):null;
   bil=`<section class="card stack"><div class="profhead"><div><h2 class="h3">Votre bilan du ${fmtDay(today())}</h2><span class="small muted">${prevB?"Comparé au bilan du "+fmtDay(prevB.d):"Votre point de départ"}</span></div>${ov!==null?`<div class="bignum"><span class="num">${ov}</span><small>${rating(ov)}</small></div>`:""}</div>
-   <div class="bars">${GKEYS.map(g=>{const v=now[g];if(v===undefined)return "";const p=prevB&&prevB.idx[g]!==undefined?prevB.idx[g]:null;const d=p===null?null:v-p;return `<div class="bar"><div class="bl"><span class="bn"><i style="background:${KCOL[g]}"></i>${GAMES[g].skill}</span><span class="num small"><b>${v}</b>${d!==null?` <span class="${d>0?"up":d<0?"down":"muted"}">${d>0?"+":""}${d}</span>`:""}</span></div><div class="bt"><span class="grow" style="width:${Math.max(3,v)}%;background:${KCOL[g]}"></span>${p!==null&&d!==0?`<em style="left:${p}%"></em>`:""}</div></div>`}).join("")}</div>
+   <div class="bars">${GKEYS.map(g=>{const v=now[g];if(v===undefined)return "";const p=prevB&&prevB.idx[g]!==undefined?prevB.idx[g]:null;const d=p===null?null:v-p;return `<div class="bar"><div class="bl"><span class="bn"><i style="background:${KCOL[g]}"></i>${GAMES[g].skill}</span><span class="num small"><b>${v}</b>${d!==null?` <span class="${d>0?"up":d<0?"down":"muted"}">${d>0?"+":""}${d}</span>`:""}</span></div><div class="bt"><span style="width:${Math.max(3,v)}%;background:${KCOL[g]}"></span>${p!==null&&d!==0?`<em style="left:${p}%"></em>`:""}</div></div>`}).join("")}</div>
    <p class="small muted">Prochain bilan conseillé dans 4 semaines. Hibi vous le proposera sur l'accueil.</p></section>`;
  }
  const P=todayPlan();
@@ -819,9 +881,9 @@ function chart(g){
   <text x="${pl-6}" y="${pt+4}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(Math.round(best))}</text>
   <text x="${pl-6}" y="${H-pb+4}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(Math.round(worst))}</text>
   <text x="${pl}" y="${H-5}" font-size="11" fill="var(--muted)">${pts.length} dernières parties</text>
-  <path d="${area}" fill="${col}" fill-opacity=".14"/>
-  <path d="${line}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-  ${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.s).toFixed(1)}" r="${i===pts.length-1?5:2.5}" fill="${col}"/>`).join("")}
+  <path class="ar" d="${area}" fill="${col}" fill-opacity=".14"/>
+  <path class="ln" pathLength="1" d="${line}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  ${pts.map((p,i)=>`<circle style="--k:${i}" cx="${x(i).toFixed(1)}" cy="${y(p.s).toFixed(1)}" r="${i===pts.length-1?5:2.5}" fill="${col}"/>`).join("")}
  </svg></div>`;
 }
 function progress(){
@@ -942,7 +1004,7 @@ function settings(){
 }
 
 /* ---------- famille : synchronisation ---------- */
-const VERSION="5.3";
+const VERSION="5.4";
 const CFG=window.VIVACE_CONFIG||{};
 const shareOn=()=>!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1072,7 +1134,7 @@ function multiChart(g,mem){
   <text x="${pl-6}" y="${pt+4}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(Math.round(best))}</text>
   <text x="${pl-6}" y="${H-pb+4}" text-anchor="end" font-size="11" fill="var(--muted)">${fmt(Math.round(worst))}</text>
   <text x="${pl}" y="${H-5}" font-size="11" fill="var(--muted)">Parties successives, 10 au maximum</text>
-  ${S.map(s=>`${s.pts.length>1?`<path d="${s.pts.map((v,i)=>`${i?"L":"M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`:""}<circle cx="${x(s.pts.length-1).toFixed(1)}" cy="${y(s.pts[s.pts.length-1]).toFixed(1)}" r="4" fill="${s.color}"/>`).join("")}
+  ${S.map(s=>`${s.pts.length>1?`<path class="ln" pathLength="1" d="${s.pts.map((v,i)=>`${i?"L":"M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`:""}<circle cx="${x(s.pts.length-1).toFixed(1)}" cy="${y(s.pts[s.pts.length-1]).toFixed(1)}" r="4" fill="${s.color}"/>`).join("")}
  </svg>`;
  return `<div class="chart">${svg}</div><div class="legend2">${S.map(s=>`<span><i style="background:${s.color}"></i>${esc(s.name)} <span class="muted num">${fmt(s.pts[s.pts.length-1])}</span></span>`).join("")}</div>`;
 }
@@ -1097,7 +1159,7 @@ const fmtShort=d=>d.toLocaleDateString("fr-FR",{day:"numeric",month:"long"});
 function programHead(){
  const w=programWeek(),ph=phaseOf(w);
  if(ph==="avant")return `<p class="small muted">Votre programme de 8 semaines démarre avec votre première séance.</p>`;
- if(ph==="fondation"){const n=foundationDone();return `<div class="stack" style="gap:.4rem"><div class="bl"><span class="eyebrow">Programme · fondation, semaine ${w} sur 8</span><span class="num small muted">${n} / 40 séances</span></div><div class="bt"><span class="grow" style="width:${Math.max(2,Math.min(100,n/40*100))}%;background:var(--ink)"></span></div></div>`}
+ if(ph==="fondation"){const n=foundationDone();return `<div class="stack" style="gap:.4rem"><div class="bl"><span class="eyebrow">Programme · fondation, semaine ${w} sur 8</span><span class="num small muted">${n} / 40 séances</span></div><div class="bt"><span style="width:${Math.max(2,Math.min(100,n/40*100))}%;background:var(--ink)"></span></div></div>`}
  if(ph==="rappel")return `<div class="stack" style="gap:.2rem"><span class="eyebrow">Programme · semaine de rappel</span><p class="small">Cinq séances cette semaine pour ancrer vos acquis, comme les séances de rappel de l'étude ACTIVE.</p></div>`;
  const nb=nextBoost(w);return `<div class="stack" style="gap:.2rem"><span class="eyebrow">Programme · entretien</span><p class="small muted">Deux séances par semaine suffisent. Prochaine semaine de rappel : semaine du ${fmtShort(weekDate(nb))}.</p></div>`;
 }
