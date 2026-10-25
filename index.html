@@ -249,7 +249,9 @@ body.playing nav.tabs{display:none}
 
 /* exercices */
 .gtop{display:flex;justify-content:space-between;align-items:center;min-height:2.75rem}
-.gtop span{color:var(--muted);font-weight:700;font-size:.9rem}
+.gtop{gap:.75rem}
+.gtop .linkbtn{white-space:nowrap;flex:none}
+.gtop span{color:var(--muted);font-weight:700;font-size:.9rem;text-align:right}
 #msg{font-size:1.1rem;min-height:3.3rem}
 #stage{transition:box-shadow .2s}
 #stage.ok,#stage.bad{border-radius:28px}
@@ -298,6 +300,25 @@ body.playing nav.tabs{display:none}
 .lg{display:inline-grid;place-items:center;width:1.5rem;height:1.5rem;border-radius:6px;font-size:.8rem}
 
 @media (max-width:360px){.tiles{grid-template-columns:1fr}}
+/* pendant un exercice : l'écran ne bouge plus. Tout tient dans la hauteur, la zone de jeu s'adapte. */
+html,body{overscroll-behavior:none}
+body.game{overflow:hidden}
+body.game .wrap{height:100vh;height:100dvh;display:flex;flex-direction:column;padding-bottom:calc(1rem + env(safe-area-inset-bottom,0px))}
+body.game #view{flex:1;min-height:0;display:flex;flex-direction:column}
+body.game #view>.stack{flex:1;min-height:0;gap:.75rem}
+body.game #msg{min-height:2.8rem}
+body.game #stage{flex:1 1 0;min-height:0;container-type:size;display:flex;flex-direction:column;justify-content:center}
+body.game #stage.ok,body.game #stage.bad{box-shadow:none}
+body.game .ufov{width:min(100%,22rem,100cqh);max-width:none}
+body.game .grid9{width:min(100%,21rem,100cqh);max-width:none}
+body.game #stage .bigcard{min-height:clamp(6rem,100cqh - 7.5rem,12rem)}
+body.game #stage .digit{font-size:min(5.5rem,24cqh)}
+#stage.ok>*{box-shadow:0 0 0 4px var(--good);border-radius:28px}
+#stage.bad>*{box-shadow:0 0 0 4px var(--bad);border-radius:28px}
+#stage.ok>.ufov{box-shadow:0 0 0 4px var(--good),inset 0 2px 10px rgba(0,0,0,.07);border-radius:50%}
+#stage.bad>.ufov{box-shadow:0 0 0 4px var(--bad),inset 0 2px 10px rgba(0,0,0,.07);border-radius:50%}
+#stage>*{transition:box-shadow .3s}
+
 /* mouvement : doux, court, jamais pendant un stimulus. Désactivé si l'appareil demande moins d'animations. */
 :root{--ease:cubic-bezier(.2,.8,.2,1);--spring:cubic-bezier(.34,1.45,.64,1)}
 @media (prefers-reduced-motion: no-preference){
@@ -386,7 +407,7 @@ const calm=()=>D.settings.pace==="calme";
 
 const GAMES={
  ufov:{name:"Champ visuel",skill:"Vitesse de traitement",better:"lower",unit:"ms",
-   steps:["Fixez la croix au centre.","Une forme apparaît au centre, et une étoile sur le pourtour, très brièvement.","Dites quelle forme était au centre, puis touchez l'endroit où était l'étoile."],
+   steps:["Gardez les yeux au centre du cercle, sur la petite croix.","Une forme apparaît au centre, et une étoile sur le bord, très brièvement.","Touchez la forme que vous avez vue au centre, puis l'endroit où était l'étoile."],
    why:"C'est le type d'exercice le mieux étudié chez les plus de 60 ans. Le temps d'affichage raccourcit quand vous réussissez, et s'allonge quand vous ratez.",
    illu:'<svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="92" fill="var(--surface)" stroke="var(--line)"/><circle cx="100" cy="100" r="16" fill="var(--ink)"/><polygon points="170,62 175,74 188,75 178,83 181,96 170,89 159,96 162,83 152,75 165,74" fill="var(--warm)"/></svg>'},
  corsi:{name:"Séquence",skill:"Mémoire de travail",better:"higher",unit:"cases",
@@ -411,7 +432,7 @@ const alive=id=>id===runId;
 function setTab(t){document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.tab===t?"page":"false"))}
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{({home,progress,famille,science,settings})[b.dataset.tab]()}));
 const MOTION=()=>!matchMedia("(prefers-reduced-motion: reduce)").matches;
-function show(html,tab){runId++;hush();document.body.classList.remove("playing");if(tab)setTab(tab);
+function show(html,tab){runId++;hush();document.body.classList.remove("playing","game");if(tab)setTab(tab);
  view.classList.remove("enter");view.innerHTML=html;window.scrollTo(0,0);
  if(MOTION()){const r=view.firstElementChild;if(r)[...r.children].forEach((c,i)=>c.style.setProperty("--i",Math.min(i,8)));
   view.querySelectorAll(".day.on").forEach((d,i)=>d.style.setProperty("--d",i));
@@ -561,7 +582,7 @@ function intro(g){
 
 /* ---------- game shell ---------- */
 function shell(g){
- runId++;spoken=new Set();document.body.classList.add("playing");
+ runId++;spoken=new Set();document.body.classList.add("playing","game");
  view.innerHTML=`<div class="stack">
   <div class="gtop"><button class="linkbtn" id="quit">‹ Quitter</button><span id="trial" class="num"></span></div>
   <div class="gname"><span class="pi" style="background:${KCOL[g]}"></span><h1 class="h2">${GAMES[g].name}</h1></div>
@@ -577,7 +598,7 @@ function shell(g){
 let PR=false,spoken=new Set();
 /* Voix : consignes enregistrées (voix neuronale douce, fichiers audio/), lues par Web Audio.
    Repli sur la synthèse du téléphone pour toute phrase non enregistrée. */
-const VOICE={"Champ visuel. Fixez la croix au centre. Une forme apparaît au centre, et une étoile sur le pourtour, très brièvement. Dites quelle forme était au centre, puis touchez l'endroit où était l'étoile.":"intro-ufov","Séquence. Des cases s'allument l'une après l'autre. Quand c'est à vous, touchez-les dans le même ordre. Chaque réussite ajoute une case. Deux erreurs de suite terminent l'exercice.":"intro-corsi","Aiguillage. Un chiffre s'affiche avec une règle : « pair ou impair ? » ou « plus ou moins que 5 ? ». La règle change sans prévenir. Six niveaux : une lettre et une troisième règle s'ajoutent, puis la règle n'est plus donnée que par la couleur de la carte, et la carte s'efface de plus en plus vite. Tous les 8 essais, vous montez si vous êtes presque sans faute, et redescendez en cas de difficulté.":"intro-switch","Liste de courses. Une liste de courses défile, un article à la fois. Ensuite, des articles s'affichent : étaient-ils sur la liste ? La liste s'allonge quand vous réussissez bien.":"intro-list","Au centre, c'était :":"m01","Essai à blanc terminé.":"m02","Fixez le centre.":"m03","La liste est finie. Prenez une respiration.":"m04","Mémorisez la liste.":"m05","Regardez bien l'ordre…":"m06","Touchez l'endroit où était l'étoile.":"m07","À vous : touchez les cases dans le même ordre.":"m08","Était-il sur la liste ?":"m09","Voici votre niveau de départ.":"m10","Bravo, on monte d'un cran.":"m11","On redescend d'un cran pour consolider.":"m12"};
+const VOICE={"Champ visuel. Gardez les yeux au centre du cercle, sur la petite croix. Une forme apparaît au centre, et une étoile sur le bord, très brièvement. Touchez la forme que vous avez vue au centre, puis l'endroit où était l'étoile.":"intro-ufov","Séquence. Des cases s'allument l'une après l'autre. Quand c'est à vous, touchez-les dans le même ordre. Chaque réussite ajoute une case. Deux erreurs de suite terminent l'exercice.":"intro-corsi","Aiguillage. Un chiffre s'affiche avec une règle : « pair ou impair ? » ou « plus ou moins que 5 ? ». La règle change sans prévenir. Six niveaux : une lettre et une troisième règle s'ajoutent, puis la règle n'est plus donnée que par la couleur de la carte, et la carte s'efface de plus en plus vite. Tous les 8 essais, vous montez si vous êtes presque sans faute, et redescendez en cas de difficulté.":"intro-switch","Liste de courses. Une liste de courses défile, un article à la fois. Ensuite, des articles s'affichent : étaient-ils sur la liste ? La liste s'allonge quand vous réussissez bien.":"intro-list","Au centre, c'était :":"m01","Essai à blanc terminé.":"m02","Fixez le centre.":"m03","La liste est finie. Prenez une respiration.":"m04","Mémorisez la liste.":"m05","Regardez bien l'ordre…":"m06","Touchez l'endroit où était l'étoile.":"m07","À vous : touchez les cases dans le même ordre.":"m08","Était-il sur la liste ?":"m09","Voici votre niveau de départ.":"m10","Bravo, on monte d'un cran.":"m11","On redescend d'un cran pour consolider.":"m12"};
 const canTTS=("speechSynthesis" in window);
 const canSpeak=canTTS||!!(window.AudioContext||window.webkitAudioContext);
 let AC=null,voiceSrc=null,voiceTok=0;const voiceBuf={};
@@ -1005,7 +1026,7 @@ function settings(){
 }
 
 /* ---------- famille : synchronisation ---------- */
-const VERSION="6.0";
+const VERSION="6.1";
 const CFG=window.VIVACE_CONFIG||{};
 const shareOn=()=>!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1379,6 +1400,7 @@ function themeNow(){
 themeNow();setInterval(themeNow,60000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)themeNow()});
 
 /* ---------- démarrage ---------- */
+document.addEventListener("touchmove",e=>{if(document.body.classList.contains("game")&&document.documentElement.scrollHeight<=innerHeight+2)e.preventDefault()},{passive:false});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
 flush();
 if(new URLSearchParams(location.search).get("famille")&&!D.family){D.onboarded=true;save();famille()}else if(!D.onboarded)onboarding(0);else home();
