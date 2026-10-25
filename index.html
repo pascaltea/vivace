@@ -75,8 +75,14 @@ img{max-width:100%}
 [hidden]{display:none!important}
 a{color:var(--accent)}
 p{margin:0}
-.wrap{max-width:34rem;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:calc(1.25rem + env(safe-area-inset-top,0px)) calc(7rem + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:34rem;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:calc(1.25rem + env(safe-area-inset-top,0px)) 2.5rem}
 body.playing .wrap{padding-bottom:calc(2rem + env(safe-area-inset-bottom,0px))}
+/* coquille d'app : la page ne bouge jamais, seul le contenu défile, la barre d'onglets fait partie de la mise en page
+   (pas de position fixe : iOS la décale parfois après le clavier) */
+html{height:100%;overflow:hidden}
+body{height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+#scroll:focus{outline:none}
+#scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 
 /* typographie */
 h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
@@ -240,7 +246,7 @@ input.code{text-transform:uppercase;letter-spacing:.18em;font-variant-numeric:ta
 .obl li{display:flex;gap:.9rem;align-items:flex-start}
 
 /* navigation */
-nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:saturate(1.8) blur(22px);backdrop-filter:saturate(1.8) blur(22px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
+nav.tabs{position:relative;flex:none;z-index:5;background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:saturate(1.8) blur(22px);backdrop-filter:saturate(1.8) blur(22px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
 nav.tabs .in{max-width:34rem;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
 nav.tabs button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:.15rem;padding:.55rem 0 .6rem;min-height:3.6rem;min-width:0;color:var(--muted);font-size:.72rem;font-weight:500}
 nav.tabs button[aria-current="page"]{color:var(--ink)}
@@ -302,8 +308,8 @@ body.playing nav.tabs{display:none}
 @media (max-width:360px){.tiles{grid-template-columns:1fr}}
 /* pendant un exercice : l'écran ne bouge plus. Tout tient dans la hauteur, la zone de jeu s'adapte. */
 html,body{overscroll-behavior:none}
-body.game{overflow:hidden}
-body.game .wrap{height:100vh;height:100dvh;display:flex;flex-direction:column;padding-bottom:calc(1rem + env(safe-area-inset-bottom,0px))}
+body.game #scroll{overflow:hidden}
+body.game .wrap{height:100%;display:flex;flex-direction:column;padding-bottom:calc(1rem + env(safe-area-inset-bottom,0px))}
 body.game #view{flex:1;min-height:0;display:flex;flex-direction:column}
 body.game #view>.stack{flex:1;min-height:0;gap:.75rem}
 body.game #msg{min-height:2.8rem}
@@ -370,7 +376,7 @@ body.game #stage .digit{font-size:min(5.5rem,24cqh)}
 </head>
 <body>
 
-<div class="wrap"><main id="view" aria-live="polite"></main></div>
+<div id="scroll" tabindex="0"><div class="wrap"><main id="view" aria-live="polite"></main></div></div>
 
 <nav class="tabs" aria-label="Navigation">
   <div class="in">
@@ -386,7 +392,7 @@ body.game #stage .digit{font-size:min(5.5rem,24cqh)}
 (function(){
 "use strict";
 const $=s=>document.querySelector(s);
-const view=$("#view");
+const view=$("#view"),SC=$("#scroll");
 const KEY="vivace-v1";
 
 function fresh(){return {settings:{size:"grand",pace:"calme",theme:"auto",voice:"off"},levels:{ufov:500,corsi:3,list:6,switch:1,swVis:1600},history:[],days:{},family:null,pending:[],bilans:[],today:null,name:"",onboarded:false}}
@@ -433,7 +439,7 @@ function setTab(t){document.querySelectorAll("nav.tabs button").forEach(b=>b.set
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{({home,progress,famille,science,settings})[b.dataset.tab]()}));
 const MOTION=()=>!matchMedia("(prefers-reduced-motion: reduce)").matches;
 function show(html,tab){runId++;hush();document.body.classList.remove("playing","game");if(tab)setTab(tab);
- view.classList.remove("enter");view.innerHTML=html;window.scrollTo(0,0);
+ view.classList.remove("enter");view.innerHTML=html;SC.scrollTop=0;
  if(MOTION()){const r=view.firstElementChild;if(r)[...r.children].forEach((c,i)=>c.style.setProperty("--i",Math.min(i,8)));
   view.querySelectorAll(".day.on").forEach((d,i)=>d.style.setProperty("--d",i));
   void view.offsetWidth;view.classList.add("enter")}
@@ -592,7 +598,7 @@ function shell(g){
   <div id="controls"></div>
  </div>`;
  $("#quit").onclick=()=>{session=null;home()};
- window.scrollTo(0,0);
+ SC.scrollTop=0;
  return runId;
 }
 let PR=false,spoken=new Set();
@@ -924,7 +930,7 @@ function progress(){
   ${profileHTML()}
   ${programCard()}
   ${bh}
-  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h2 class="h3">4 dernières semaines</h2><span class="muted small num">${active} jours actifs sur 28</span></div>
+  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem"><h2 class="h3">4 dernières semaines</h2><span class="muted small num">${active} ${active>1?"jours actifs":"jour actif"} sur 28</span></div>
    <div class="cal" aria-label="Calendrier des 28 derniers jours">${days.map(d=>`<i class="${D.days[dkey(d)]?"on":""}" title="${d.toLocaleDateString("fr-FR")}"></i>`).join("")}</div>
    <p class="small muted">Objectif de la phase en cours : ${weekGoal()} jours par semaine.</p></section>
   <p class="small muted">Sur chaque courbe, plus haut veut dire mieux. Le dernier point est plus gros.</p>
@@ -1026,7 +1032,7 @@ function settings(){
 }
 
 /* ---------- famille : synchronisation ---------- */
-const VERSION="6.1";
+const VERSION="6.2";
 const CFG=window.VIVACE_CONFIG||{};
 const shareOn=()=>!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1129,10 +1135,10 @@ async function familyView(fresh){
  mem.forEach((m,i)=>m.color=SERIES[i%SERIES.length]);
  const wk=weekDays().map(dkey);
  const memRows=mem.map(m=>{const days=new Set(m.res.map(r=>r.d));const n=wk.filter(k=>days.has(k)).length;const last=m.res.length?m.res.map(r=>r.d).sort().pop():null;
-  return `<div class="mem"><span class="nm"><i style="background:${m.color}"></i><span style="min-width:0;overflow-wrap:anywhere">${esc(m.name)}</span>${m.me?'<span class="you">vous</span>':""}</span><span class="num small"><b>${n}</b> / 5 jours</span><div class="wk" aria-label="${n} jours actifs cette semaine">${wk.map(k=>`<span class="${days.has(k)?"on":""}"></span>`).join("")}</div><span class="small muted" style="grid-column:1/-1">${last?"Dernière séance : "+fmtDay(last):"Pas encore de séance"}</span></div>`}).join("");
+  return `<div class="mem"><span class="nm"><i style="background:${m.color}"></i><span style="min-width:0;overflow-wrap:anywhere">${esc(m.name)}</span>${m.me?'<span class="you">vous</span>':""}</span><span class="num small"><b>${n}</b> / 5 ${n>1?"jours":"jour"}</span><div class="wk" aria-label="${n} ${n>1?"jours actifs":"jour actif"} cette semaine">${wk.map(k=>`<span class="${days.has(k)?"on":""}"></span>`).join("")}</div><span class="small muted" style="grid-column:1/-1">${last?"Dernière séance : "+fmtDay(last):"Pas encore de séance"}</span></div>`}).join("");
  const total=mem.reduce((s,m)=>s+wk.filter(k=>m.res.some(r=>r.d===k)).length,0),goal=mem.length*5;
  box.innerHTML=`
-  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;flex-wrap:wrap"><h2 class="h3">Cette semaine</h2><span class="small muted num">${total} jours actifs sur ${goal} visés à ${mem.length}</span></div>
+  <section class="card stack"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;flex-wrap:wrap"><h2 class="h3">Cette semaine</h2><span class="small muted num">${mem.length>1?(mem.length===2?"À vous deux":"À vous "+mem.length)+" : ":""}${total} ${total>1?"jours actifs":"jour actif"} sur ${goal} visés</span></div>
    <div>${memRows||'<p class="muted">Personne pour l\'instant.</p>'}</div>
    ${mem.length<2?'<p class="small muted">Invitez un proche pour commencer à vous suivre mutuellement.</p>':""}</section>
   ${Object.keys(GAMES).map(g=>`<section class="card stack" style="gap:.6rem"><div><h2 class="h3">${GAMES[g].name}</h2><span class="small muted">${GAMES[g].skill} · ${GAMES[g].better==="lower"?"en "+GAMES[g].unit+", plus haut sur la courbe = plus rapide":GAMES[g].unit+", plus haut = mieux"}</span></div>${multiChart(g,mem)}</section>`).join("")}
@@ -1400,7 +1406,9 @@ function themeNow(){
 themeNow();setInterval(themeNow,60000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)themeNow()});
 
 /* ---------- démarrage ---------- */
-document.addEventListener("touchmove",e=>{if(document.body.classList.contains("game")&&document.documentElement.scrollHeight<=innerHeight+2)e.preventDefault()},{passive:false});
+document.addEventListener("touchmove",e=>{if(document.body.classList.contains("game")&&document.SC.scrollHeight<=SC.clientHeight+2)e.preventDefault()},{passive:false});
+// après le clavier, iOS laisse parfois la page décalée : on la remet en place
+document.addEventListener("focusout",()=>setTimeout(()=>{if(window.scrollY||document.documentElement.scrollTop)window.scrollTo(0,0)},60));
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
 flush();
 if(new URLSearchParams(location.search).get("famille")&&!D.family){D.onboarded=true;save();famille()}else if(!D.onboarded)onboarding(0);else home();
