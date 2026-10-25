@@ -1,5 +1,5 @@
 // Hibi : fonctionne hors ligne. Changer VERSION à chaque mise en ligne.
-const VERSION = "hibi-5.4";
+const VERSION = "hibi-6.0";
 const SHELL = ["./", "index.html", "config.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png",
   "audio/intro-corsi.mp3", "audio/intro-list.mp3", "audio/intro-switch.mp3", "audio/intro-ufov.mp3", "audio/m01.mp3", "audio/m02.mp3", "audio/m03.mp3", "audio/m04.mp3", "audio/m05.mp3", "audio/m06.mp3", "audio/m07.mp3", "audio/m08.mp3", "audio/m09.mp3", "audio/m10.mp3", "audio/m11.mp3", "audio/m12.mp3"];
 

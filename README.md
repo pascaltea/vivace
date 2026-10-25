@@ -32,6 +32,10 @@ Sans cette étape, l'app fonctionne normalement mais les résultats restent sur 
 
 Pour la sauvegarde personnelle (code de 12 caractères, sans compte), exécuter aussi `supabase/schema-v2-sauvegarde.sql` si la base a été créée avant la version 5.0.
 
+## Comptes
+
+Compte facultatif, sans mot de passe : on saisit son e-mail, on reçoit un code à 6 chiffres. Les progrès se synchronisent sur tous les appareils connectés au même compte, avec fusion (rien ne se perd si l'on a joué sur deux téléphones). Activer avec `supabase/schema-v4-comptes.sql` puis la configuration décrite dans `supabase/COMPTES.md`.
+
 ## Programme
 
 Inspiré de l'étude ACTIVE : 8 semaines de fondation (5 séances par semaine), puis entretien (2 par semaine) et une semaine de rappel aux 3e, 6e et 12e mois. Les rappels peuvent être ajoutés à l'agenda depuis les Réglages.

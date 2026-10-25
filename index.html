@@ -370,7 +370,7 @@ const KEY="vivace-v1";
 
 function fresh(){return {settings:{size:"grand",pace:"calme",theme:"auto",voice:"off"},levels:{ufov:500,corsi:3,list:6,switch:1,swVis:1600},history:[],days:{},family:null,pending:[],bilans:[],today:null,name:"",onboarded:false}}
 function load(){try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(r&&r.levels&&r.settings){r.history=r.history.filter(h=>h.g!=="switch"||h.v===2);r.levels.switch=r.levels.switch||1;r.family=r.family||null;r.pending=r.pending||[];r.bilans=r.bilans||[];r.settings.theme=r.settings.theme||"auto";r.settings.voice=r.settings.voice||"off";return r}}catch(e){}return fresh()}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
+function save(){D.updated=Date.now();try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}accountSoon()}
 let D=load();
 document.documentElement.dataset.size=D.settings.size;
 
@@ -515,7 +515,7 @@ function onboarding(step){
    <li><span class="pi" style="background:var(--k-list)"></span><span><b>Gratuit, sans publicité</b><br><span class="muted small">Pas de compte à créer. Vos données restent sur votre téléphone, sauf si vous activez la sauvegarde ou un groupe famille.</span></span></li>
   </ul>
   <button class="btn" id="obnext">Continuer</button>
-  <button class="linkbtn" id="obrest" style="align-self:center">J'ai déjà un code de sauvegarde</button>
+  <button class="linkbtn" id="obrest" style="align-self:center">J'ai déjà un compte ou un code</button>
  </div>`);document.body.classList.add("playing");$("#obnext").onclick=()=>onboarding(1);$("#obrest").onclick=()=>{D.onboarded=true;save();settings();setTimeout(()=>{const x=$("#bk-in");if(x){const dt=x.closest("details");if(dt)dt.open=true;x.scrollIntoView({block:"center"});x.focus()}},50)};$("#obskip").onclick=()=>{finish();home()};return}
  if(step===1){const S=D.settings;const seg=(k,opts)=>`<div class="seg" role="group">${opts.map(o=>`<button data-k="${k}" data-v="${o[0]}" aria-pressed="${S[k]===o[0]}">${o[1]}</button>`).join("")}</div>`;
   show(`<div class="stack-lg ob">
@@ -636,7 +636,7 @@ async function play(g,forcePractice){
  const r=await RUN[g](id);
  if(!r||!alive(id))return;
  const prev=lastOf(g);
- D.history.push({d:today(),g,s:r.score,v:2});
+ D.history.push({d:today(),g,s:r.score,v:2,t:Date.now()});
  if(D.history.length>600)D.history=D.history.slice(-600);
  D.days[today()]=true;
  if(session){const P=todayPlan();if(!P.done.includes(g))P.done.push(g)}
@@ -980,13 +980,14 @@ function settings(){
   <section class="stack" style="gap:.6rem"><h2 class="h3">Apparence</h2>${seg("theme",[["auto","Auto"],["light","Clair"],["dark","Sombre"],["system","Système"]])}<p class="small muted">Auto : clair en journée, sombre et chaud de 20 h à 7 h pour limiter la lumière bleue avant le coucher.</p></section>
   <section class="stack" style="gap:.6rem"><h2 class="h3">Rythme</h2>${seg("pace",[["calme","Calme"],["standard","Standard"]])}<p class="small muted">Le rythme calme laisse plus de temps pour regarder les séquences et lire la liste. Le temps de Champ visuel s'adapte de toute façon à vous.</p></section>
   <section class="stack" style="gap:.6rem"><h2 class="h3">Voix</h2>${seg("voice",[["off","Consignes à lire"],["on","Consignes lues à voix haute"]])}<p class="small muted">${canSpeak?"La voix lit chaque consigne au début des exercices. Vous pouvez aussi toucher « Écouter la consigne » avant chaque exercice.":"Ce navigateur ne permet pas la lecture à voix haute."}</p></section>
-  ${backupSection()}
+  ${accountSection()}
+  ${signedIn()?"":backupSection()}
   <section class="card stack" style="gap:.7rem"><h2 class="h3">Rappels du programme</h2><p class="small muted">Ajoute votre programme à l'agenda, avec une alerte à l'heure choisie : du lundi au vendredi pendant la fondation, puis le mardi et le samedi, et une semaine de rappel aux 3ᵉ, 6ᵉ et 12ᵉ mois.</p>
    <label class="f" for="rem-time">Heure du rappel<input class="t" type="time" id="rem-time" value="${esc(D.remTime||"09:00")}"></label>
    <a class="btn" id="rem" href="#" download="hibi-programme.ics">Ajouter mon programme à l'agenda</a></section>
   <section class="card stack" style="gap:.6rem"><h2 class="h3">Bilan</h2><p class="small muted">${(D.bilans||[]).length?`Dernier bilan : ${fmtDay(D.bilans[D.bilans.length-1].d)}.`:"Pas encore de bilan."} Un bilan par mois suffit.</p><button class="btn ghost" id="sbil">Faire un bilan maintenant</button></section>
   <section class="card stack" style="gap:.6rem"><h2 class="h3">Niveaux actuels</h2><ul class="plain num">${GKEYS.map(g=>`<li>${GAMES[g].name} : ${levelText(g)}</li>`).join("")}</ul></section>
-  <section class="stack" style="gap:.6rem"><h2 class="h3">Vos données</h2><p class="small muted">${D.family?`Vos résultats sont enregistrés sur cet appareil et partagés avec le groupe « ${esc(D.family.name)} ». Seules les personnes qui ont le code du groupe les voient.`:"Vos résultats sont enregistrés sur cet appareil."}${D.backup?" Une copie est sauvegardée avec votre code de sauvegarde.":""} Hibi ne collecte ni e-mail, ni localisation, ni publicité. Seuls votre prénom, vos scores et leurs dates sont envoyés, et uniquement si vous activez la sauvegarde ou un groupe famille.</p><div id="rz"><button class="btn ghost" id="reset">Effacer mes résultats sur cet appareil</button></div>${D.family?'<div id="lz"><button class="btn ghost" id="leave">Quitter le groupe et effacer mes résultats partagés</button></div>':""}</section>
+  <section class="stack" style="gap:.6rem"><h2 class="h3">Vos données</h2><p class="small muted">${D.family?`Vos résultats sont enregistrés sur cet appareil et partagés avec le groupe « ${esc(D.family.name)} ». Seules les personnes qui ont le code du groupe les voient.`:"Vos résultats sont enregistrés sur cet appareil."}${D.backup?" Une copie est sauvegardée avec votre code de sauvegarde.":""} ${signedIn()?" Vos progrès sont aussi copiés dans votre compte, lié à votre adresse e-mail. Hibi ne collecte ni localisation, ni publicité, et n'utilise votre e-mail que pour vous envoyer le code de connexion.":" Hibi ne collecte ni e-mail, ni localisation, ni publicité. Seuls votre prénom, vos scores et leurs dates sont envoyés, et uniquement si vous activez la sauvegarde, un compte ou un groupe famille."}</p><div id="rz"><button class="btn ghost" id="reset">Effacer mes résultats sur cet appareil</button></div>${D.family?'<div id="lz"><button class="btn ghost" id="leave">Quitter le groupe et effacer mes résultats partagés</button></div>':""}</section>
   <button class="linkbtn" id="reob" style="align-self:flex-start">Revoir la présentation de Hibi</button>
   <p class="small muted">Hibi · version ${VERSION}</p>
  </div>`,"settings");
@@ -994,17 +995,17 @@ function settings(){
  const setIcs=()=>{const t=$("#rem-time").value||"09:00";D.remTime=t;save();$("#rem").href="data:text/calendar;charset=utf-8,"+encodeURIComponent(programIcs(t))};
  setIcs();$("#rem-time").onchange=setIcs;
  $("#sbil").onclick=startBilan;
- wireBackup();
+ wireBackup();wireAccount();
  $("#reob").onclick=()=>onboarding(0);
  if(D.family)$("#leave").onclick=()=>{$("#lz").innerHTML=`<div class="confirm"><p>Quitter « ${esc(D.family.name)} » ? Vos résultats seront retirés du groupe. Ils restent sur cet appareil.</p><button class="btn danger" id="lyes">Oui, quitter le groupe</button><button class="btn quiet" id="lno">Annuler</button><p class="err" id="lerr" hidden></p></div>`;
   $("#lyes").onclick=async()=>{try{await rpc("vivace_leave",{p_code:D.family.code,p_member:D.family.memberId});D.family=null;D.pending=[];save();settings()}catch(e){const x=$("#lerr");x.hidden=false;x.textContent=errText(e)}};$("#lno").onclick=settings};
  view.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{D.settings[b.dataset.k]=b.dataset.v;if(b.dataset.k==="size")document.documentElement.dataset.size=b.dataset.v;save();themeNow();settings()});
  $("#reset").onclick=()=>{$("#rz").innerHTML=`<div class="confirm"><p>Effacer tout l'historique, les bilans et revenir aux niveaux de départ ?</p><button class="btn danger" id="yes">Oui, tout effacer</button><button class="btn quiet" id="no">Annuler</button></div>`;
-  $("#yes").onclick=()=>{const s=D.settings,f=D.family,nm=D.name,bk=D.backup;D=fresh();D.settings=s;D.family=f;D.name=nm;D.backup=bk||null;D.onboarded=true;save();backupSoon();settings()};$("#no").onclick=settings};
+  $("#yes").onclick=()=>{const s=D.settings,f=D.family,nm=D.name,bk=D.backup;D=fresh();D.settings=s;D.family=f;D.name=nm;D.backup=bk||null;D.onboarded=true;D.resetAt=Date.now();save();backupSoon();settings()};$("#no").onclick=settings};
 }
 
 /* ---------- famille : synchronisation ---------- */
-const VERSION="5.4";
+const VERSION="6.0";
 const CFG=window.VIVACE_CONFIG||{};
 const shareOn=()=>!!(CFG.supabaseUrl&&CFG.supabaseAnonKey);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1237,6 +1238,135 @@ function wireBackup(){
  };
 }
 
+/* ---------- compte : connexion par code reçu par e-mail, synchronisation entre appareils ---------- */
+const AKEY="hibi-auth";
+var AUTH=(()=>{try{return JSON.parse(localStorage.getItem(AKEY)||"null")}catch(e){return null}})();
+function signedIn(){return !!(AUTH&&AUTH.refresh_token)}
+function saveAuth(a){AUTH=a;try{a?localStorage.setItem(AKEY,JSON.stringify(a)):localStorage.removeItem(AKEY)}catch(e){}}
+const sbUrl=p=>CFG.supabaseUrl.replace(/\/$/,"")+p;
+async function gotrue(path,body,token){
+ let r;try{r=await fetch(sbUrl("/auth/v1/"+path),{method:"POST",headers:{"Content-Type":"application/json",apikey:CFG.supabaseAnonKey,Authorization:"Bearer "+(token||CFG.supabaseAnonKey)},body:JSON.stringify(body||{})})}catch(e){throw new Error("offline")}
+ const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(e){}
+ if(!r.ok){const e=new Error((j&&(j.msg||j.error_description||j.message||j.error))||"server");e.status=r.status;e.code=j&&(j.error_code||j.code);throw e}
+ return j;
+}
+function keepSession(j){saveAuth({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:Date.now()+((j.expires_in||3600)-60)*1000,email:(j.user&&j.user.email)||(AUTH&&AUTH.email)||"",user_id:(j.user&&j.user.id)||(AUTH&&AUTH.user_id)})}
+var refreshing=null;
+async function accessToken(){
+ if(!signedIn())throw new Error("signedout");
+ if(Date.now()<AUTH.expires_at)return AUTH.access_token;
+ if(!refreshing)refreshing=gotrue("token?grant_type=refresh_token",{refresh_token:AUTH.refresh_token}).then(keepSession)
+  .catch(e=>{if(e.status===400||e.status===401||e.status===403){saveAuth(null);throw new Error("signedout")}throw e}).finally(()=>{refreshing=null});
+ await refreshing;return AUTH.access_token;
+}
+async function rest(path,opts){
+ const tok=await accessToken();let r;
+ try{r=await fetch(sbUrl("/rest/v1/"+path),Object.assign({},opts,{headers:Object.assign({"Content-Type":"application/json",apikey:CFG.supabaseAnonKey,Authorization:"Bearer "+tok},(opts&&opts.headers)||{})}))}catch(e){throw new Error("offline")}
+ const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(e){}
+ if(!r.ok)throw new Error((j&&j.message)||"server");
+ return j;
+}
+function authErr(e){const m=(e&&e.message)||"",s=e&&e.status,c=(e&&e.code)||"";
+ if(m==="offline")return "Pas de connexion internet. Réessayez quand vous êtes connecté.";
+ if(s===429||/rate/i.test(c+m))return "Trop de demandes d'affilée. Patientez une minute avant de redemander un code.";
+ if(/otp_expired|expired|invalid/i.test(c+m)&&s>=400&&s<500)return "Ce code n'est pas bon ou a expiré. Vérifiez les chiffres, ou demandez un nouveau code.";
+ if(/email/i.test(c+m)&&s===400)return "Cette adresse e-mail ne semble pas valide.";
+ if(/signup.*disabled|not allowed/i.test(c+m))return "La création de compte n'est pas encore activée sur le serveur.";
+ if(/relation|user_data|schema cache|could not find/i.test(m))return "Les comptes ne sont pas encore activés sur le serveur.";
+ return "Le serveur n'a pas répondu correctement. Réessayez dans un instant.";
+}
+
+// Fusion : rien ne se perd entre deux appareils. Les listes s'additionnent (sans doublon),
+// les réglages d'exercice suivent l'appareil utilisé le plus récemment.
+function syncPayload(){return {v:2,updated:D.updated||0,resetAt:D.resetAt||0,levels:D.levels,history:D.history,days:D.days,bilans:D.bilans,name:D.name,practiced:D.practiced||{},program:D.program||null,family:D.family||null,remTime:D.remTime||null,today:D.today||null,onboarded:!!D.onboarded}}
+function mergeData(L,R){
+ if(!R)return L;
+ const cut=Math.max(L.resetAt||0,R.resetAt||0),cutDay=cut?dkey(new Date(cut)):"";
+ const hk=h=>h.t?"t"+h.t+h.g:[h.g,h.d,h.s].join("|");
+ const count=(arr)=>{const m=new Map();(arr||[]).forEach(h=>{const k=hk(h);m.set(k,(m.get(k)||[]).concat([h]))});return m};
+ const A=count(L.history),B=count(R.history),hist=[];
+ new Set([...A.keys(),...B.keys()]).forEach(k=>{const a=A.get(k)||[],b=B.get(k)||[];hist.push(...(a.length>=b.length?a:b))});
+ const history=hist.filter(h=>!cut||(h.t?h.t>=cut:h.d>cutDay)).sort((x,y)=>x.d<y.d?-1:x.d>y.d?1:(x.t||0)-(y.t||0));
+ const days={};[L.days,R.days].forEach(o=>Object.keys(o||{}).forEach(k=>{if(!cut||k>=cutDay)days[k]=1}));
+ const bil={};[...(L.bilans||[]),...(R.bilans||[])].forEach(b=>{if(!cut||b.d>=cutDay)bil[b.d]=b});
+ const hasL=(L.history||[]).length>0,hasR=(R.history||[]).length>0;
+ const newer=hasR&&!hasL?R:hasL&&!hasR?L:((R.updated||0)>(L.updated||0)?R:L); // un appareil neuf ne prend pas le pas sur le compte
+ const pr=Object.assign({},R.practiced||{},L.practiced||{});
+ const ps=[L.program,R.program].filter(p=>p&&p.start).sort((a,b)=>a.start<b.start?-1:1)[0]||null;
+ let today=newer.today||null;const lt=L.today,rt=R.today;
+ if(lt&&rt&&lt.d===rt.d)today=Object.assign({},newer.today,{done:[...new Set([...(lt.done||[]),...(rt.done||[])])]});
+ else if(lt&&rt)today=lt.d>rt.d?lt:rt;
+ return Object.assign({},L,{levels:newer.levels||L.levels,name:newer.name||L.name||R.name||"",family:newer.family!==undefined?newer.family:L.family,remTime:newer.remTime||L.remTime||null,
+  history,days,bilans:Object.values(bil).sort((a,b)=>a.d<b.d?-1:1),practiced:pr,program:ps,today,onboarded:!!(L.onboarded||R.onboarded),resetAt:cut,updated:Math.max(L.updated||0,R.updated||0)});
+}
+var acTimer=null,acBusy=false;
+function accountSoon(){if(!signedIn()||!shareOn())return;clearTimeout(acTimer);acTimer=setTimeout(()=>{if(document.body.classList.contains("playing"))return accountSoon();accountSync().catch(()=>{})},3000)}
+async function accountPush(){
+ if(!signedIn())return;
+ await rest("user_data?on_conflict=user_id",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({user_id:AUTH.user_id,data:syncPayload(),updated_at:new Date().toISOString()})});
+ AUTH.synced=Date.now();saveAuth(AUTH);
+}
+async function accountSync(){
+ if(!signedIn())return false;if(acBusy){accountSoon();return false}acBusy=true;
+ try{
+  const rows=await rest("user_data?select=data&user_id=eq."+encodeURIComponent(AUTH.user_id));
+  const R=rows&&rows[0]&&rows[0].data;const before=JSON.stringify(syncPayload());
+  if(R){const M=mergeData(Object.assign({},D),R);Object.assign(D,M);try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
+  await accountPush();
+  return JSON.stringify(syncPayload())!==before;
+ }finally{acBusy=false}
+}
+function accountSection(){
+ if(!shareOn())return "";
+ if(signedIn()){
+  const when=AUTH.synced?new Date(AUTH.synced).toLocaleString("fr-FR",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"";
+  return `<section class="card stack" style="gap:.7rem" id="ac"><h2 class="h3">Compte</h2>
+   <p class="st-on">Connecté</p><p><b>${esc(AUTH.email)}</b></p>
+   <p class="small muted" id="ac-status">Vos progrès sont synchronisés automatiquement sur tous les appareils où vous vous connectez.${when?" Dernière synchronisation : "+when+".":""}</p>
+   <button class="btn quiet" id="ac-sync">Synchroniser maintenant</button>
+   <div id="acz" class="stack" style="gap:.2rem"><button class="linkbtn" id="ac-out" style="align-self:flex-start">Se déconnecter</button><button class="linkbtn" id="ac-del" style="align-self:flex-start">Supprimer mon compte</button></div>
+  </section>`;
+ }
+ return `<section class="card stack" style="gap:.7rem" id="ac"><h2 class="h3">Compte</h2>
+  <p class="small muted">Retrouvez vos progrès sur tous vos appareils. Pas de mot de passe : vous recevez un code par e-mail.</p>
+  <div id="ac-form" class="stack" style="gap:.7rem">${loginStep1()}</div>
+ </section>`;
+}
+const loginStep1=(email)=>`<label class="f" for="ac-email">Votre adresse e-mail<input class="t" id="ac-email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" value="${esc(email||"")}" placeholder="prenom@exemple.fr"></label>
+  <button class="btn" id="ac-send">Recevoir un code</button><p class="err" id="ac-err" hidden></p>`;
+const loginStep2=email=>`<p>Un code vient d'être envoyé à <b>${esc(email)}</b>. Il arrive en général en moins d'une minute, pensez à regarder dans les indésirables.</p>
+  <label class="f" for="ac-code">Code reçu par e-mail<input class="t code" id="ac-code" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="123456"></label>
+  <button class="btn" id="ac-verify">Me connecter</button><p class="err" id="ac-err" hidden></p>
+  <div class="stack" style="gap:.2rem"><button class="linkbtn" id="ac-resend" style="align-self:flex-start">Renvoyer un code</button><button class="linkbtn" id="ac-change" style="align-self:flex-start">Changer d'adresse e-mail</button></div>`;
+function wireAccount(onDone){
+ if(!shareOn())return;
+ const err=t=>{const x=$("#ac-err");if(x){x.hidden=!t;x.textContent=t||""}};
+ const form=$("#ac-form");
+ const step1=email=>{form.innerHTML=loginStep1(email);
+  const send=async()=>{const em=$("#ac-email").value.trim().toLowerCase();
+   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em))return err("Indiquez une adresse e-mail complète, par exemple prenom@exemple.fr.");
+   const b=$("#ac-send");b.disabled=true;b.textContent="Envoi…";err("");
+   try{await gotrue("otp",{email:em,create_user:true});step2(em)}catch(e){err(authErr(e));b.disabled=false;b.textContent="Recevoir un code"}};
+  $("#ac-send").onclick=send;$("#ac-email").onkeydown=e=>{if(e.key==="Enter")send()}};
+ const step2=email=>{form.innerHTML=loginStep2(email);const c=$("#ac-code");c.focus();
+  const verify=async()=>{const code=c.value.replace(/\D/g,"");if(code.length<6)return err("Le code compte 6 chiffres.");
+   const b=$("#ac-verify");b.disabled=true;b.textContent="Connexion…";err("");
+   try{const j=await gotrue("verify",{type:"email",email,token:code});keepSession(j);
+    b.textContent="Récupération de vos progrès…";
+    try{await accountSync()}catch(e){}
+    D.onboarded=D.onboarded||(D.history||[]).length>0;save();(onDone||settings)();
+   }catch(e){err(authErr(e));b.disabled=false;b.textContent="Me connecter"}};
+  $("#ac-verify").onclick=verify;c.oninput=()=>{if(c.value.replace(/\D/g,"").length===6)verify()};c.onkeydown=e=>{if(e.key==="Enter")verify()};
+  $("#ac-resend").onclick=async()=>{const r=$("#ac-resend");r.disabled=true;try{await gotrue("otp",{email,create_user:true});r.textContent="Nouveau code envoyé"}catch(e){err(authErr(e));r.disabled=false}};
+  $("#ac-change").onclick=()=>step1(email)};
+ if(form){step1();return}
+ const sy=$("#ac-sync");if(sy)sy.onclick=async()=>{sy.disabled=true;sy.textContent="Synchronisation…";try{await accountSync();settings()}catch(e){$("#ac-status").textContent=e.message==="signedout"?"Votre session a expiré. Reconnectez-vous.":errText(e);sy.disabled=false;sy.textContent="Synchroniser maintenant";if(e.message==="signedout")settings()}};
+ $("#ac-out").onclick=()=>{$("#acz").innerHTML=`<div class="confirm"><p>Se déconnecter ? Vos résultats restent sur cet appareil et dans votre compte.</p><button class="btn" id="aco-yes">Oui, me déconnecter</button><button class="btn quiet" id="aco-no">Annuler</button></div>`;
+  $("#aco-no").onclick=settings;$("#aco-yes").onclick=async()=>{try{await accountSync()}catch(e){}try{await gotrue("logout",{},AUTH.access_token)}catch(e){}saveAuth(null);settings()}};
+ $("#ac-del").onclick=()=>{$("#acz").innerHTML=`<div class="confirm"><p>Supprimer définitivement votre compte et la copie de vos progrès sur le serveur ? Les résultats restent sur cet appareil.</p><button class="btn danger" id="acd-yes">Oui, supprimer mon compte</button><button class="btn quiet" id="acd-no">Annuler</button><p class="err" id="acd-err" hidden></p></div>`;
+  $("#acd-no").onclick=settings;$("#acd-yes").onclick=async()=>{try{await rest("rpc/vivace_account_delete",{method:"POST",body:"{}"});saveAuth(null);settings()}catch(e){const x=$("#acd-err");x.hidden=false;x.textContent=e.message==="signedout"?"Votre session a expiré. Reconnectez-vous puis réessayez.":authErr(e)}}};
+}
+
 /* ---------- thème : clair le jour, sombre et chaud le soir ---------- */
 function themeNow(){
  const t=D.settings.theme||"auto",h=new Date().getHours(),night=h>=20||h<7,r=document.documentElement;
@@ -1252,6 +1382,11 @@ themeNow();setInterval(themeNow,60000);document.addEventListener("visibilitychan
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
 flush();
 if(new URLSearchParams(location.search).get("famille")&&!D.family){D.onboarded=true;save();famille()}else if(!D.onboarded)onboarding(0);else home();
+// synchronisation du compte : au démarrage et au retour dans l'app (au plus toutes les 5 minutes)
+let lastSync=0;
+function bgSync(){if(!signedIn()||!shareOn()||Date.now()-lastSync<3e5)return;lastSync=Date.now();
+ accountSync().then(changed=>{if(changed&&!document.body.classList.contains("playing")&&$(".hero")&&document.querySelector('nav.tabs button[data-tab="home"][aria-current="page"]'))home()}).catch(()=>{})}
+bgSync();document.addEventListener("visibilitychange",()=>{if(!document.hidden)bgSync()});
 })();
 </script>
 </body>
